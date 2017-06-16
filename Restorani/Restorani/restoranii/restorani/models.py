@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Restaurant(models.Model):#done
@@ -15,6 +15,7 @@ class Beaverage(models.Model):#done
 	restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
 	
 class Employee(models.Model):#
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
@@ -48,6 +49,7 @@ class Reservation(models.Model):#done
 	complete = models.BooleanField()
 
 class Guest(models.Model):#done
+	user = models.OneToOneField(User,on_delete=models.CASCADE)
 	reservations = models.ManyToManyField(Reservation)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
@@ -63,6 +65,7 @@ class Post(models.Model):#done
 	restaurant = models.ForeignKey(Restaurant)
 	
 class Supplier(models.Model):#done
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
@@ -96,6 +99,7 @@ class RatingServices(models.Model):#done
 
 	
 class RestaurantManager(models.Model):#done
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
@@ -111,6 +115,7 @@ class Schedule(models.Model):#done
 	date = models.DateTimeField()
 	
 class SystemManager(models.Model):#done
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
