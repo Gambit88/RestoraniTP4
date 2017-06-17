@@ -15,15 +15,14 @@ class Beaverage(models.Model):#done
 	restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
 	
 class Employee(models.Model):#
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
-	password = models.CharField(max_length = 40)
 	restaurant = models.ForeignKey(Restaurant)
 	firstLogin = models.BooleanField()
 	shoeSize = models.CharField(max_length = 20)
 	size = models.CharField(max_length = 20)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
 class Food(models.Model):#done
 	name = models.CharField(max_length = 50)
@@ -49,12 +48,11 @@ class Reservation(models.Model):#done
 	complete = models.BooleanField()
 
 class Guest(models.Model):#done
-	user = models.OneToOneField(User,on_delete=models.CASCADE)
+	user = models.OneToOneField(User,on_delete=models.CASCADE, null=True)
 	reservations = models.ManyToManyField(Reservation)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
-	password = models.CharField(max_length = 40)
 	activated = models.BooleanField()
 	address = models.CharField(max_length = 250)
 	reservations = models.ManyToManyField(Reservation)
@@ -65,11 +63,10 @@ class Post(models.Model):#done
 	restaurant = models.ForeignKey(Restaurant)
 	
 class Supplier(models.Model):#done
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
-	password = models.CharField(max_length = 40)
 	posts = models.ManyToManyField(Post)
 
 class Offer(models.Model):#done
@@ -99,11 +96,10 @@ class RatingServices(models.Model):#done
 
 	
 class RestaurantManager(models.Model):#done
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
-	password = models.CharField(max_length = 40)
 	restaurant = models.ForeignKey(Restaurant)
 	
 
@@ -115,11 +111,10 @@ class Schedule(models.Model):#done
 	date = models.DateTimeField()
 	
 class SystemManager(models.Model):#done
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 	name = models.CharField(max_length = 30)
 	surname = models.CharField(max_length = 35)
 	email = models.EmailField(max_length = 250)
-	password = models.CharField(max_length = 40)
 	
 class Bartender(Employee):#done
 	pass
