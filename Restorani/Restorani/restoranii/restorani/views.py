@@ -9,6 +9,12 @@ from django.core.validators import validate_email
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from restorani.models import Guest
+from restorani.models import Restaurant
+from restorani.models import RestaurantManager
+from restorani.models import Employee
+from restorani.models import Cook
+from restorani.models import Waiter
+from restorani.models import Bartender
 from django.db import IntegrityError
 from django.contrib.auth.decorators import user_passes_test,login_required
 from django.shortcuts import redirect
@@ -27,6 +33,10 @@ def index(request):
 			if request.user.guest.activated==False:
 				return redirect("logOut")
 			return redirect("guestHomePage")
+		if (request.user.first_name == "SYSTEM"):
+			return redirect("SMHomePage")
+		if (request.user.first_name == "MANAGER"):
+			return redirect("RMHomePage")
 @csrf_exempt
 #LogInFunkcija
 def loginRequest(request):
@@ -158,4 +168,140 @@ def guestPage(request):
 	template = loader.get_template("static/guestHomeTmp.html")
 	return HttpResponse(template.render({'Email':request.user.guest.email}))
 
-#//////////////#
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#uslov za pristump stranici kao menadzer sistema
+def SystemManCheck(systemManager):
+	return systemManager.first_name=="SYSTEM"
+#home stranica za menagera sistema
+@user_passes_test(SystemManCheck,login_url='./')
+def SystemManPage(request):
+	template = loader.get_template("static/SMHomePage.html")
+	return HttpResponse(template.render())
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#uslov za pristump stranici kao menadzer restorana
+def restaurantManagerCheck(restaurantManager):
+	return restaurantManager.first_name=="MANAGER"
+#home stranica za menagera sistema
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def restaurantManagerCheck(request):
+	template = loader.get_template("static/RMHomePage.html")
+	return HttpResponse(template.render())
+
+#registracija novog restorana
+@csrf_exempt
+def registarRestaurant(request):
+	if request.method == 'GET':
+		template = loader.get_template("static/restaurantReg.html")
+		return HttpResponse(template.render())
+	if request.method == 'POST':
+		if not request.POST.get('name'):
+			error = 'Name has not been submited'
+			link = "./restaurantReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not  request.POST.get('type'):
+			error = 'Type has not been submited'
+			link = "./restaurantReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not  request.POST.get('address'):
+			error = 'Address has not been submited'
+			link = "./restaurantReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not  request.POST.get('dimX') or not request.POST.get('dimY'):
+			error = 'Dimension has not been submited'
+			link = "./restaurantReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		restaurant = Restaurant.objects.create(name = request.POST.get('name'), type = request.POST.get('type'), address =request.POST.get('address') , sizeX = request.POST.get('dimX'), sizeY = request.POST.get('dimY'))
+		template = loader.get_template("static/success.html")
+		return HttpResponse(template.render())
+
+#///////////////////////////////////////////////////////////////////////////////////////////////
+#registracija menadzera restorana
+@csrf_exempt
+def registarRestaurantMan(request):
+	if request.method == 'GET':
+		list = Restaurant.objects.all()
+		template = loader.get_template("restaurantManReg.html")
+		return HttpResponse(template.render({'lista':list}))
+	if request.method == 'POST':
+		restaurantID = Restaurant.objects.get(name = request.POST.get('r'))
+		if not request.POST.get('name'):
+			error = 'Name has not been submited'
+			link = "./restaurantManReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not  request.POST.get('lastname'):
+			error = 'Last Name has not been submited'
+			link = "./restaurantManReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not  request.POST.get('email'):
+			error = 'Email has not been submited'
+			link = "./restaurantManReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		user = User.objects.create_user(username = request.POST.get('email'), first_name = "MANAGER", password = "manager")
+		restaurantManager = RestaurantManager.objects.create(name = request.POST.get('name'), surname = request.POST.get('lastname'), email = request.POST.get('email') , restaurant = restaurantID, user = user)
+		template = loader.get_template("static/success.html")
+		return HttpResponse(template.render())
+
+#/////////////////////////////////////////////////////////////////////////////////////////////
+@csrf_exempt
+def registarEmployee(request):
+	if request.method == 'GET':
+		list = Restaurant.objects.all()
+		template = loader.get_template("employeeReg.html")
+		return HttpResponse(template.render({'lista': list}))
+	if request.method == 'POST':
+		restaurantID = Restaurant.objects.get(name=request.POST.get('r'))
+		if not request.POST.get('name'):
+			error = 'Name has not been submited'
+			link = "./employeeReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not request.POST.get('lastname'):
+			error = 'Last Name has not been submited'
+			link = "./employeeReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not request.POST.get('email'):
+			error = 'Email has not been submited'
+			link = "./employeeReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if not request.POST.get('shoe'):
+			error = 'Shoe size has not been submited'
+			link = "./employeeReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if request.POST.get('job') == "Cook":
+			if not request.POST.get('type'):
+				error = 'Type of cook has not been submited'
+				link = "./employeeReg"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error': error, 'link': link}))
+		if request.POST.get('job') == "Waiter":
+			user = User.objects.create_user(username = request.POST.get('email'), first_name = "WAITER", password = "waiter")
+			waiter = Waiter.objects.create(kind=request.POST.get('type'), name=request.POST.get('name'),
+												 surname=request.POST.get('lastname'), email=request.POST.get('email'),
+												 shoeSize=request.POST.get('shoe'), size=request.POST.get('size'),
+												 user=user,
+												 restaurant=restaurantID, firstLogin = False)
+		if request.POST.get('job') == "Bartender":
+			user = User.objects.create_user(username = request.POST.get('email'), first_name = "BARTENDER", password = "bartender")
+			bartender = Bartender.objects.create(kind=request.POST.get('type'), name=request.POST.get('name'),
+									   surname=request.POST.get('lastname'), email=request.POST.get('email'),
+									   shoeSize=request.POST.get('shoe'), size=request.POST.get('size'), user=user,
+									   restaurant=restaurantID, firstLogin = False)
+
+		if request.POST.get('job') == "Cook":
+			user = User.objects.create_user(username=request.POST.get('email'), first_name="COOK", password="cook")
+			cook = Cook.objects.create(kind=request.POST.get('type'), name = request.POST.get('name'), surname = request.POST.get('lastname'), email = request.POST.get('email'),
+										   shoeSize = request.POST.get('shoe'), size = request.POST.get('size'), user = user, restaurant = restaurantID, firstLogin = False)
+
+		template = loader.get_template("static/success.html")
+		return HttpResponse(template.render())

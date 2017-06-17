@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Restaurant(models.Model):#done
 	name = models.CharField(max_length = 50)
 	type = models.CharField(max_length = 50)
+	address = models.CharField(max_length = 50, null=True)
 	sizeX = models.IntegerField()
 	sizeY = models.IntegerField()
 
