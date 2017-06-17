@@ -10,13 +10,53 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from restorani.models import Guest
 from django.db import IntegrityError
-
-
+from django.contrib.auth.decorators import user_passes_test,login_required
+from django.shortcuts import redirect
+from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
+#///SVI///#
+#Go To Index funkcija
 def index(request):
-	template = loader.get_template("static/guestLogin.html")
-	return HttpResponse(template.render())
+	if not request.user.is_authenticated():
+		template = loader.get_template("static/guestLogin.html")
+		return HttpResponse(template.render())
+	else:
+		#ovde uneti tonu ifova za svaki tip korisnika koji ima razlicitu pocetnu stranicu
+		if(request.user.first_name=="GUEST"):
+			return redirect("guestHomePage")
+@csrf_exempt
+#LogInFunkcija
+def loginRequest(request):
+	userEmail = request.POST.get('email',False)
+	userPass = request.POST.get('password',False)
+	if not bool(userEmail):
+		err = "Email has not been submited."
+		link = "./"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error':err , 'link':link}))
+	if not bool(userPass):
+		err = "Password has not been submited."
+		link = "./"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error':err , 'link':link}))
+	user = authenticate(request, username=userEmail, password=userPass)
+	if user is not None:
+		login(request, user)
+		return redirect("IndexPage")
+	else:
+		err = "User with that email/password combination does not exist."
+		link = "./"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error':err , 'link':link}))
+#LogOutFunkcija
+@login_required
+def logOut(request):
+	logout(request)
+	return redirect("IndexPage")
+#///////////#
+#///GOSTI///#
+#Registracija Gostiju
 @csrf_exempt
 def registerGuests(request):
 	if request.method == 'GET':
@@ -80,7 +120,7 @@ def registerGuests(request):
 		_thread.start_new_thread(sendEmail, (email,guest.id))
 		template = loader.get_template("static/completeReg.html")
 		return HttpResponse(template.render())
-		
+#slanje mail-a pri registraciji
 def sendEmail(email,id):
 	fromaddr = "tp4restoranii@gmail.com"
 	toaddr = email
@@ -98,7 +138,7 @@ def sendEmail(email,id):
 	text = msg.as_string()
 	server.sendmail(fromaddr, toaddr, text)
 	server.quit()
-
+#aktivacija preko maila
 def activateGuest(request):
 	if request.method=='GET':
 		id = request.GET.get('id')
@@ -107,3 +147,13 @@ def activateGuest(request):
 		guest.save()
 		template = loader.get_template("static/completeActivation.html")
 		return HttpResponse(template.render())
+#uslov za pristup stranici kao gost
+def guestCheck(guest):
+	return guest.first_name=="GUEST"
+#home stranica za goste
+@user_passes_test(guestCheck,login_url='./')
+def guestPage(request):
+	template = loader.get_template("static/guestHomeTmp.html")
+	return HttpResponse(template.render())
+
+#//////////////#
