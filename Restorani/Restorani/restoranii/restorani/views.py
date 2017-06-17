@@ -23,7 +23,9 @@ def index(request):
 		return HttpResponse(template.render())
 	else:
 		#ovde uneti tonu ifova za svaki tip korisnika koji ima razlicitu pocetnu stranicu
-		if(request.user.first_name=="GUEST"):
+		if request.user.first_name=="GUEST":
+			if request.user.guest.activated==False:
+				return redirect("logOut")
 			return redirect("guestHomePage")
 @csrf_exempt
 #LogInFunkcija
@@ -50,7 +52,7 @@ def loginRequest(request):
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error':err , 'link':link}))
 #LogOutFunkcija
-@login_required
+@login_required(redirect_field_name='IndexPage')
 def logOut(request):
 	logout(request)
 	return redirect("IndexPage")
@@ -148,12 +150,12 @@ def activateGuest(request):
 		template = loader.get_template("static/completeActivation.html")
 		return HttpResponse(template.render())
 #uslov za pristup stranici kao gost
-def guestCheck(guest):
-	return guest.first_name=="GUEST"
+def guestCheck(user):
+	return user.first_name=="GUEST"
 #home stranica za goste
 @user_passes_test(guestCheck,login_url='./')
 def guestPage(request):
 	template = loader.get_template("static/guestHomeTmp.html")
-	return HttpResponse(template.render())
+	return HttpResponse(template.render({'Email':request.user.guest.email}))
 
 #//////////////#

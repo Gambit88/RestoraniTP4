@@ -18,5 +18,4 @@ class UserTestCase(TestCase):
 		user = User.objects.get(username="testRestTP4@gmail.com")
 		guest = Guest.objects.get(email = "testRestTP4@gmail.com")
 		self.assertEqual(guest.user.username, user.username)
-		
 	

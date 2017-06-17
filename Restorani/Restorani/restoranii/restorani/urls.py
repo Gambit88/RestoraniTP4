@@ -7,5 +7,5 @@ urlpatterns = [
 	url(r'^activate', views.activateGuest),
 	url(r'^login',views.loginRequest),
 	url(r'^guestHomePage', views.guestPage, name = "guestHomePage"),
-	url(r'^logout', views.logOut),
+	url(r'^logout', views.logOut, name="logOut"),
 ]
