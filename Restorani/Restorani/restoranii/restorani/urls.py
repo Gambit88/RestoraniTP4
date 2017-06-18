@@ -11,4 +11,8 @@ urlpatterns = [
 	url(r'^restaurantReg', views.registarRestaurant),
 	url(r'restaurantManReg', views.registarRestaurantMan),
 	url(r'employeeReg', views.registarEmployee),
+	url(r'^cookHomePage', views.cookPage, name = "cookHomePage"),
+	url(r'^bartenderHomePage', views.bartenderPage, name = "bartenderHomePage"),
+	url(r'^waiterHomePage', views.waiterPage, name = "waiterHomePage"),
+	url(r'^changePassword', views.firstLogin),
 ]

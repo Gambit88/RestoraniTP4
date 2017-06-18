@@ -37,6 +37,12 @@ def index(request):
 			return redirect("SMHomePage")
 		if (request.user.first_name == "MANAGER"):
 			return redirect("RMHomePage")
+		if (request.user.first_name == "COOK"):
+			return redirect("cookHomePage")
+		if (request.user.first_name == "BARTENDER"):
+			return redirect("bartenderHomePage")
+		if (request.user.first_name == "WAITER"):
+			return redirect("waiterHomePage")
 @csrf_exempt
 #LogInFunkcija
 def loginRequest(request):
@@ -285,23 +291,100 @@ def registarEmployee(request):
 				template = loader.get_template("error.html")
 				return HttpResponse(template.render({'error': error, 'link': link}))
 		if request.POST.get('job') == "Waiter":
-			user = User.objects.create_user(username = request.POST.get('email'), first_name = "WAITER", password = "waiter")
-			waiter = Waiter.objects.create(kind=request.POST.get('type'), name=request.POST.get('name'),
+			user = User.objects.create_user(username = request.POST.get('email'), first_name = "WAITER", password = "waiter", last_name = True)
+			waiter = Waiter.objects.create(name=request.POST.get('name'),
 												 surname=request.POST.get('lastname'), email=request.POST.get('email'),
 												 shoeSize=request.POST.get('shoe'), size=request.POST.get('size'),
 												 user=user,
 												 restaurant=restaurantID, firstLogin = False)
 		if request.POST.get('job') == "Bartender":
-			user = User.objects.create_user(username = request.POST.get('email'), first_name = "BARTENDER", password = "bartender")
-			bartender = Bartender.objects.create(kind=request.POST.get('type'), name=request.POST.get('name'),
+			user = User.objects.create_user(username = request.POST.get('email'), first_name = "BARTENDER", password = "bartender", last_name = True)
+			bartender = Bartender.objects.create(name=request.POST.get('name'),
 									   surname=request.POST.get('lastname'), email=request.POST.get('email'),
 									   shoeSize=request.POST.get('shoe'), size=request.POST.get('size'), user=user,
 									   restaurant=restaurantID, firstLogin = False)
 
 		if request.POST.get('job') == "Cook":
-			user = User.objects.create_user(username=request.POST.get('email'), first_name="COOK", password="cook")
+			user = User.objects.create_user(username=request.POST.get('email'), first_name="COOK", password="cook", last_name = True)
 			cook = Cook.objects.create(kind=request.POST.get('type'), name = request.POST.get('name'), surname = request.POST.get('lastname'), email = request.POST.get('email'),
 										   shoeSize = request.POST.get('shoe'), size = request.POST.get('size'), user = user, restaurant = restaurantID, firstLogin = False)
 
 		template = loader.get_template("static/success.html")
 		return HttpResponse(template.render())
+###############################################################################
+#Uslova za pristup stranicama kao odedjeni zaposleni radnik
+def cookCheck(employee):
+	return employee.first_name=="COOK"
+def bartenderCheck(employee):
+	return employee.first_name=="BARTENDER"
+def waiterCheck(employee):
+	return employee.first_name=="WAITER"
+################################################################
+#home stranica za kuvara
+@user_passes_test(cookCheck,login_url='./')
+def cookPage(request):
+	if(request.user.last_name == "False"):
+		template = loader.get_template("cookHomePage.html")
+		return HttpResponse(template.render())
+	else:
+		template = loader.get_template("static/firstLoginPasswordChange.html")
+		return HttpResponse(template.render())
+###################################################################
+#home stranica za sankera
+@user_passes_test(bartenderCheck,login_url='./')
+def bartenderPage(request):
+	if(request.user.last_name == "False"):
+		template = loader.get_template("bartenderHomePage.html")
+		return HttpResponse(template.render())
+	else:
+		template = loader.get_template("static/firstLoginPasswordChange.html")
+		return HttpResponse(template.render())
+###################################################################
+#home stranica za konobara
+@user_passes_test(waiterCheck,login_url='./')
+def waiterPage(request):
+	if(request.user.last_name == "False"):
+		template = loader.get_template("waiterHomePage.html")
+		return HttpResponse(template.render())
+	else:
+		template = loader.get_template("static/firstLoginPasswordChange.html")
+		return HttpResponse(template.render())
+#########################################################
+@csrf_exempt
+def firstLogin(request):
+	password = request.POST.get('password', False)
+	repeatPass = request.POST.get('passwordR', False)
+	if not password:
+		err = "Password has not been submited."
+		link = "./changePassword"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error': err, 'link': link}))
+	if not repeatPass:
+		err = "Repeat Password has not been submited."
+		link = "./changePassword"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error': err, 'link': link}))
+	if (password == repeatPass):
+		if(request.user.first_name == "COOK"):
+			request.user.set_password(password);
+			request.user.last_name = False
+			request.user.save()
+			template = loader.get_template("cookHomePage.html")
+			return HttpResponse(template.render())
+		if (request.user.first_name == "BARTENDER"):
+			request.user.set_password(password);
+			request.user.last_name = False
+			request.user.save()
+			template = loader.get_template("bartenderHomePage.html")
+			return HttpResponse(template.render())
+		if (request.user.first_name == "WAITER"):
+			request.user.set_password(password);
+			request.user.last_name = False
+			request.user.save()
+			template = loader.get_template("waiterHomePage.html")
+			return HttpResponse(template.render())
+	else:
+		err = "Passwords do not match!"
+		link = "./changePassword"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error': err, 'link': link}))
