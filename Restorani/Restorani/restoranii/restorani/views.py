@@ -354,9 +354,17 @@ def waiterPage(request):
 def firstLogin(request):
 	password = request.POST.get('password', False)
 	repeatPass = request.POST.get('passwordR', False)
+	if (request.user.first_name == "COOK"):
+		template = loader.get_template("cookHomePage.html")
+		link = "./cookHomePage"
+	if (request.user.first_name == "BARTENDER"):
+		template = loader.get_template("bartenderHomePage.html")
+		link = "./bartenderHomePage"
+	if (request.user.first_name == "WAITER"):
+		template = loader.get_template("waiterHomePage.html")
+		link = "./waiterHomePage"
 	if not password:
 		err = "Password has not been submited."
-		link = "./changePassword"
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	if not repeatPass:
@@ -364,27 +372,13 @@ def firstLogin(request):
 		link = "./changePassword"
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
+
 	if (password == repeatPass):
-		if(request.user.first_name == "COOK"):
-			request.user.set_password(password);
-			request.user.last_name = False
-			request.user.save()
-			template = loader.get_template("cookHomePage.html")
-			return HttpResponse(template.render())
-		if (request.user.first_name == "BARTENDER"):
-			request.user.set_password(password);
-			request.user.last_name = False
-			request.user.save()
-			template = loader.get_template("bartenderHomePage.html")
-			return HttpResponse(template.render())
-		if (request.user.first_name == "WAITER"):
-			request.user.set_password(password);
-			request.user.last_name = False
-			request.user.save()
-			template = loader.get_template("waiterHomePage.html")
-			return HttpResponse(template.render())
+		request.user.set_password(password);
+		request.user.last_name = False
+		request.user.save()
+		return HttpResponse(template.render())
 	else:
 		err = "Passwords do not match!"
-		link = "./changePassword"
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
