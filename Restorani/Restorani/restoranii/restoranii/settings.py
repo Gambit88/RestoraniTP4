@@ -32,6 +32,13 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
 	'restorani.apps.RestoraniConfig',
+	'Bartender.apps.BartenderConfig',
+	'Cook.apps.CookConfig',
+	'Guest.apps.GuestConfig',
+	'RestaurantManager.apps.RestaurantmanagerConfig',
+	'Supplier.apps.SupplierConfig',
+	'SystemManager.apps.SystemmanagerConfig',
+	'Waiter.apps.WaiterConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

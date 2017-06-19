@@ -19,4 +19,11 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 	url(r'^restoranii/',include('restorani.urls')),
+	url(r'^restoranii/',include('Bartender.urls')),
+	url(r'^restoranii/',include('Cook.urls')),
+	url(r'^restoranii/',include('Guest.urls')),
+	url(r'^restoranii/',include('RestaurantManager.urls')),
+	url(r'^restoranii/',include('Supplier.urls')),
+	url(r'^restoranii/',include('SystemManager.urls')),
+	url(r'^restoranii/',include('Waiter.urls')),
 ]
