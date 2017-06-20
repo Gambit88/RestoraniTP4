@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supplier</title>
+</head>
+<body>
+     <a href="rmHomePage"> Back </a> <br> <br>
+    Restaurant: {{rest.name}} <br> <br>
+    <table border="1">
+        <tr>
+            <td> Name </td>
+            <td> Last Name </td>
+            <td> Email </td>
+        </tr>
+        {%for l in supplier %}
+            <tr>
+                <td>{{l.name}}</td>
+                <td>{{l.surname}}</td>
+                <td>{{l.email}}</td>
+            </tr>
+        {%endfor%}
+    </table>
+
+    <br><br>
+
+    <form action="supplier" method="post">
+        <table>
+            <tr>
+                <td> Name: </td>
+                <td> <input type="text" name="name"/> </td>
+            </tr>
+            <tr>
+                <td> Last Name: </td>
+                <td> <input type="text" name="lastname"/> </td>
+            </tr>
+            <tr>
+                <td> Email: </td>
+                <td> <input type="text" name="email"/> </td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input type="submit" value="Add"/> </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

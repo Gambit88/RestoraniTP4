@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Registration</title>
+</head>
+<body>
+    <a href="smHomePage"> Back </a> <br> <br>
+    <form action="./restaurantReg" method="post">
+        <table border="1">
+            <tr>
+                <td> Name </td>
+                <td> Type </td>
+                <td> Address </td>
+                <td> Dimensions of restaurant </td>
+            </tr>
+            {%for l in lista %}
+                <tr>
+                    <td> {{l.name}} </td>
+                    <td> {{l.type}} </td>
+                    <td> {{l.address}} </td>
+                    <td> {{l.sizeX}} X {{l.sizeY}} </td>
+                </tr>
+            {%endfor%}
+        </table>
+        <br><br>
+        <table>
+            <tr>
+                <td> Name: </td>
+                <td> <input type="text" name="name"/> </td>
+            </tr>
+            <tr>
+                <td> Type: </td>
+                <td> <input type="text" name="type"/> </td>
+            </tr>
+            <tr>
+                <td> Address: </td>
+                <td> <input type="text" name="address"/> </td>
+            </tr>
+            <tr>
+                <td> Dimensions of restaurant: </td>
+                <td> <input type="number" name="dimX"/> X <input type="number" name="dimY"/> </td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input type="submit" value="Register"/> </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

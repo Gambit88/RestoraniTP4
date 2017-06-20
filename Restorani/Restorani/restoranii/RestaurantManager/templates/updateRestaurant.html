@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Informations</title>
+</head>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+    Restaurant Name: {{rest.name}} <br>
+    Restaurant Type: {{rest.type}} <br><br>
+
+    <form action="updateRestaurant" method="post">
+        <table>
+            <tr>
+                <td> New Name: </td>
+                <td> <input type="text" name="name"/> </td>
+            </tr>
+            <tr>
+                <td> New Type: </td>
+                <td> <input type="text" name="type"/> </td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input type="submit" value="Change"/> </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

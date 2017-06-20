@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Restaurant Manager Registration</title>
+    <title>Registration</title>
 </head>
 <body>
     <a href="smHomePage"> Back </a> <br> <br>
-    <form action="restaurantManReg" method="post">
+
+    <form action="SystemManagerReg" method="post">
         <table border="1">
             <tr>
                 <td> Name </td>
                 <td> Last Name </td>
                 <td> Email </td>
-                <td> Restaurant </td>
             </tr>
-            {%for l in managers %}
+            {%for l in sysManager %}
                 <tr>
-                    <td> {{l.name}} </td>
-                    <td> {{l.surname}} </td>
-                    <td> {{l.email}} </td>
-                    <td> {{l.restaurant.name}} </td>
+                    <td>{{l.name}}</td>
+                    <td>{{l.surname}}</td>
+                    <td>{{l.email}}</td>
                 </tr>
             {%endfor%}
         </table>
@@ -38,13 +37,9 @@
                 <td> <input type="text" name="email"/> </td>
             </tr>
             <tr>
-                <td> Restaurant: </td>
-                <td> <select name="r"> {%for l in lista %} <option name="rr">  {{l.name}} </option> {%endfor%} </select> </td>
+                <td colspan="2"> <input type="submit" value="Registar"/> </td>
             </tr>
-            <tr>
-                <td colspan="2"> <input type="submit" value="Register"/> </td>
-            </tr>
-         </table>
-     </form>
+        </table>
+    </form>
 </body>
 </html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Food</title>
+</head>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+    Restaurant: {{rest.name}} <br> <br>
+     <table border="1" name="food">
+         <tr>
+            <td> Name </td>
+            <td> Description </td>
+            <td> Price </td>
+         </tr>
+         {%for l in food %}
+            <tr>
+                <td>{{l.name}}</td>
+                <td>{{l.description}}</td>
+                <td>{{l.price}} RSD</td>
+            </tr>
+         {%endfor%}
+     </table>
+    <br><br>
+
+    <form action="meal" method="post">
+        <table>
+            <tr>
+                <td> Name: </td>
+                <td> <input type="text" name="name"/> </td>
+            </tr>
+            <tr>
+                <td> Description: </td>
+                <td> <input type="text" name="description"/> </td>
+            </tr>
+            <tr>
+                <td> Price: </td>
+                <td> <input type="number" name="price"/> RSD </td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input type="submit" value="Add"/> </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

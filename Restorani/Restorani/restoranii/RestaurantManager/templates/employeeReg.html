@@ -2,10 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Employee Registration</title>
+    <title>Registration</title>
 </head>
 <body>
+    <a href="rmHomePage"> Back </a> <br> <br>
     <form action="./employeeReg" method="post">
+        Employees in restaurant {{rest}}:
+        <table border="1">
+            <tr>
+                <td> Name </td>
+                <td> Last Name</td>
+                <td> Email </td>
+                <td> Shoe size </td>
+                <td> Size </td>
+            </tr>
+            {%for l in employee %}
+            <tr>
+                <td>{{l.name}}</td>
+                <td>{{l.surname}}</td>
+                <td>{{l.email}}</td>
+                <td>{{l.shoeSize}}</td>
+                <td>{{l.size}}</td>
+            </tr>
+        {%endfor%}
+        </table>
+        <br><br>
         <table>
             <tr>
                 <td> Name: </td>
@@ -36,7 +57,7 @@
             </tr>
             <tr>
                 <td> Restaurant: </td>
-                <td> <select name="r"> {%for l in lista %} <option>  {{l.name}} </option> {%endfor%} </select> </td>
+                <td> <input type="text" name="restaurant" value="{{rest}}" readonly/> </td>
             <tr>
                 <td> Job: </td>
                 <td> <select name="job">
