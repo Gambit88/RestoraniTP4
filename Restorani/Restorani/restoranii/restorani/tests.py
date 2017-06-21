@@ -6,6 +6,8 @@ from restorani.models import Employee
 from restorani.models import Waiter
 from restorani.models import Bartender
 from restorani.models import Cook
+from restorani.models import SystemManager
+from restorani.models import Supplier
 from django.contrib.auth.models import User
 
 # Create your tests here.
@@ -35,6 +37,12 @@ class UserTestCase(TestCase):
 									   shoeSize=36, size="Woman S",
 									   user=user_cook,
 									   restaurant=restaurant, firstLogin=False)
+		user_system = User.objects.create_user(username="admin@admin.com", password='password', first_name="SYSTEM")
+		system = SystemManager.objects.create(name = "system", surname = "system", email = "admin@admin.com", user = user_system)
+		user_supplier = User.objects.create_user(username="supplier@gmail.com", password='password', first_name="SUPPLIER")
+		supplier = Supplier.objects.create(name="name", surname="surname",
+										   email="supplier@gmail.com", user=user_supplier)
+
 	def test_user(self):
 		user = User.objects.get(username="testRestTP4@gmail.com")
 		self.assertEqual(user.first_name,"GUEST")
@@ -49,7 +57,6 @@ class UserTestCase(TestCase):
 
 	def test_manager_restaurant(self):
 		manager = RestaurantManager.objects.get(email="mirjana@gmail.com")
-		user_manager = User.objects.get(username="mirjana@gmail.com")
 		self.assertEqual(manager.user.first_name, "MANAGER")
 
 	def test_waiter(self):
@@ -60,3 +67,23 @@ class UserTestCase(TestCase):
 
 	def test_cook(self):
 		self.assertIsNotNone(Employee.objects.get(email="cook@gmail.com"), msg=None)
+
+	def test_system_manager(self):
+		sys = SystemManager.objects.get(email="admin@admin.com")
+		self.assertEqual(sys.user.first_name, "SYSTEM")
+
+	def test_supplier(self):
+		supplier = Supplier.objects.get(email="supplier@gmail.com")
+		self.assertEqual(supplier.user.first_name, "SUPPLIER")
+
+	def test_update_restaurant_name(self):
+		restaurant = Restaurant.objects.get(name = "name")
+		restaurant.name = "update"
+		restaurant.save()
+		self.assertEqual(restaurant.name, "update")
+
+	def test_update_restaurant_type(self):
+		restaurant = Restaurant.objects.get(type = "type")
+		restaurant.type = "update"
+		restaurant.save()
+		self.assertEqual(restaurant.type, "update")

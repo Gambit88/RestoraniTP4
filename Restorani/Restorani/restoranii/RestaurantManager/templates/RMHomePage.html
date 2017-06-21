@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Home Page</title>
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css.css' %}" />
 </head>
 <body>
     <form action="logout">
-       Welcome {{manager.name}} {{manager.surname}} <input type="submit" value="Logout"/>
+       <p> Welcome {{manager.name}} {{manager.surname}}     <input type="submit" value="Logout"/> </p>
     </form>
+    <br>
     <form action="employeeReg">
         <input type="submit" value="Add Employee"/>
     </form>
+    <br>
     <form action="beverages">
         <input type="submit" value="Add Beverages"/>
     </form>
+    <br>
     <form action="meal">
         <input type="submit" value="Add Meal"/>
     </form>
+    <br>
     <form action="supplier">
         <input type="submit" value="Suppliers"/>
     </form>
+    <br>
     <form action="updateRestaurant">
         <input type="submit" value="Change Restaurant Informations"/>
     </form>
