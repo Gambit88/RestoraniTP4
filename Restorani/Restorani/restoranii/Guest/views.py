@@ -145,8 +145,12 @@ def editprofile(request):
 	user = Guest.objects.only("name","surname","password"
 	change = request.POST.get('type')
 	if change=='n':
-		
+		pass
 	if change=='s':
+		pass
 	if change=='e':
+		pass
 	if change=='a':
+		pass
 	if change=='p':
+		pass
