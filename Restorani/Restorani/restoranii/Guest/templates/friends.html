@@ -1,0 +1,29 @@
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<a href="./guestHomePage" >Home</a>  <a href="./RestaurantList" >Restaurant list</a>  Friends  <a href="./GuestProfile" >Profile</a>
+<br/>
+<br/>
+<form method="post" action="./Friends">
+Email:<input type="text"/>   <input type="submit" value="Add a friend"/>
+</form>
+<br/>
+<br/>
+Frends:
+<br/>
+<table>
+<thead>
+	<tr>
+		<th>Full name</th><th>Email</th><th>Delete</th>
+	</tr>
+</thead>
+<tbody>
+	{%for friend in friends%}
+		<td>{{friend.name}} {{friend.surname}}</td><td>{{friend.email}}</td><td><form method="delete" action="./Friends"><input name = "identity" type="hidden" value="{{friend.id}}"/><input type="submit" value="Remove"/></form></td>
+	{%endfor%}
+</tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<a href="./guestHomePage" >Home</a>  <a href="./RestaurantList" >Restaurant list</a>  <a href="./Friends" >Friends</a>  Profile
+<br/>
+<br/>
+<br/>
+Name: {{name}}
+<form method="post" action="./EditProfileGuest">
+Change name: <input type="text" name="name"/>
+<input type="hidden" value="n" name="type"/>
+</form>
+<br/>
+<br/>
+Surname: {{surname}}
+<form method="post" action="./EditProfileGuest">
+Change surname: <input type="text" name="surname"/>
+<input type="hidden" value="s" name="type"/>
+<br/>
+<input type="submit" value="Change"/>
+</form>
+<br/>
+<br/>
+Address: {{address}}
+<form method="post" action="./EditProfileGuest">
+Change address: <input type="text" name="address"/>
+<input type="hidden" value="a" name="type"/>
+<br/>
+<input type="submit" value="Change"/>
+</form>
+<br/>
+<br/>
+Email: {{email}}
+<form method="post" action="./EditProfileGuest">
+Change email: <input type="text" name="email"/>
+<input type="hidden" value="e" name="type"/>
+<br/>
+<input type="submit" value="Change"/>
+</form>
+<br/>
+<br/>
+Change password:
+<form method="post" action="./EditProfileGuest">
+	Password: <input type="password" name="pass"/>
+	Repeat password: <input type="password" name="rpass"/>
+	<input type="hidden" value="p" name="type"/>
+	<input type="submit" value="Change"/>
+</form>
+</body>
+</html>

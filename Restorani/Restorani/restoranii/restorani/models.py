@@ -47,6 +47,7 @@ class Reservation(models.Model):#done
 	date = models.DateTimeField()
 	duration = models.IntegerField()
 	complete = models.BooleanField()
+	restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE, null=True)
 
 class Guest(models.Model):#done
 	user = models.OneToOneField(User,on_delete=models.CASCADE, null=True)

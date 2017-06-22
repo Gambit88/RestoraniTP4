@@ -1,0 +1,22 @@
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<a href="./guestHomePage" >Home</a>  Restaurant list  <a href="./Friends" >Friends</a> <a href="./GuestProfile" >  Profile</a>
+<br/>
+<br/>
+<table>
+<thead>
+	<tr>
+		<th>Restaurant</th><th>Type</th><th>Address</th><th>Reserve</th>
+	</tr>
+</thead>
+<tbody>
+	{%for restaurant in restaurants%}
+		<td>{{restaurant.name}} </td><td>{{restaurant.type}} </td><td>{{restaurant.address}} </td><td><form method="post" action="./Reserve"><input name = "identity" type="hidden" value="{{restaurant.id}}"/><input type="submit" value="Reserve"/></form></td>
+	{%endfor%}
+</tbody>
+</table>
+</body>
+</html>

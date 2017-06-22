@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from restorani.models import Guest
+from restorani.models import Reservation
+from restorani.models import Restaurant
 import smtplib
 import _thread
 from email.mime.multipart import MIMEMultipart
@@ -107,7 +109,44 @@ def guestCheck(user):
 #home stranica za goste
 @user_passes_test(guestCheck,login_url='./')
 def guestPage(request):
-	template = loader.get_template("static/guestHomeTmp.html")
-	return HttpResponse(template.render({'Email':request.user.guest.email}))
+	template = loader.get_template("guestHomepage.html")
+	reservations = Reservation.objects.defer("restaurantTables").filter(guest= request.user.guest)
+	return HttpResponse(template.render({'visits':reservations}))
 
-#//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#friends
+@csrf_exempt
+@user_passes_test(guestCheck,login_url='./')
+def friends(request):
+	if request.method=="GET":
+		friendList = request.user.guest.friends.all()
+		template = loader.get_template("friends.html")
+		return HttpResponse(template.render({'friends':friendList}))
+	if request.method=="DELETE":
+		pass
+	if request.method=="POST":
+		pass
+
+#restaurant list
+@user_passes_test(guestCheck,login_url='./')
+def restaurantList(request):
+	restaurants = Restaurant.objects.defer("name","id","type","address")
+	template = loader.get_template("restaurantList.html")
+	return HttpResponse(template.render({'restaurants':restaurants}))
+#profile
+@user_passes_test(guestCheck,login_url='./')
+def profile(request):
+	template = loader.get_template("guestProfile.html")
+	return HttpResponse(template.render({'name':request.user.guest.name,'surname':request.user.guest.surname,'email':request.user.guest.email,'address':request.user.guest.address}))
+	
+#edit profile data
+@csrf_exempt
+@user_passes_test(guestCheck,login_url='./')
+def editprofile(request):
+	user = Guest.objects.only("name","surname","password"
+	change = request.POST.get('type')
+	if change=='n':
+		
+	if change=='s':
+	if change=='e':
+	if change=='a':
+	if change=='p':
