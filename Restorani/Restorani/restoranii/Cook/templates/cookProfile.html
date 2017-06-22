@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cook Profile</title>
+</head>
+<body>
+    <form method = post action = "./editCookProfile">
+        <table>
+            <tr>
+                <td>Name</td>
+                <td><input value = {{cook.name}} name = "name"></td>
+            </tr>
+            <tr>
+                <td>Surname</td>
+                <td><input value = {{cook.surname}} name = "surname"></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{cook.email}}</td>
+            </tr>
+            <tr>
+                <td>Restaurant</td>
+                <td>{{cook.restaurant.name}}</td>
+            </tr>
+            <tr>
+                <td>Kind</td>
+                <td><input value = {{cook.kind}} name = "kind"></td>
+            </tr>
+            <tr>
+                <td>Size</td>
+                <td> <select name="size" >
+                    <option selected disabled hidden>{{cook.size}}</option>
+                    <option> Woman S </option>
+                    <option> Woman M </option>
+                    <option> Woman L </option>
+                    <option> Male S </option>
+                    <option> Male M </option>
+                    <option> Male L </option>
+                 </select> </td>
+            </tr>
+            <tr>
+                <td>Shoe Size</td>
+                <td><input type="number" value = {{cook.shoeSize}} name="shoeSize"/></td>
+            </tr>
+            <tr><td></td><td><input type="submit" value="Change"/></td></tr>
+        </table>
+    </form>
+    <form method = "post" action="./editCookPassword">
+        <table>
+            <tr>
+                <td>Old Password</td>
+                <td><input name = "oldPass"></td>
+            </tr>
+            <tr>
+                <td>New Password</td>
+                <td><input name = "newPass"></td>
+            </tr>
+            <tr>
+                <td>Repeat Password</td>
+                <td><input name = "repPass"></td>
+            </tr>
+            <tr><td></td><td><input type = submit value = Change></td></tr>
+        </table>
+    </form>
+    <br>
+    <br>
+    <a href = "{{back}}">Back</a>
+
+</body>
+</html>
