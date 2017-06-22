@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 </head>
 <body>
-<a href="./guestHomePage" >Home</a>  <a href="./RestaurantList" >Restaurant list</a>  <a href="./Friends" >Friends</a>  Profile
+<a href="./guestHomePage" >Home</a>  <a href="./RestaurantList" >Restaurant list</a>  <a href="./Friends" >Friends</a>  Profile  <a href="./logout">Logout</a>
 <br/>
 <br/>
 <br/>
@@ -11,6 +11,8 @@ Name: {{name}}
 <form method="post" action="./EditProfileGuest">
 Change name: <input type="text" name="name"/>
 <input type="hidden" value="n" name="type"/>
+<br/>
+<input type="submit" value="Change"/>
 </form>
 <br/>
 <br/>
@@ -33,18 +35,13 @@ Change address: <input type="text" name="address"/>
 <br/>
 <br/>
 Email: {{email}}
-<form method="post" action="./EditProfileGuest">
-Change email: <input type="text" name="email"/>
-<input type="hidden" value="e" name="type"/>
-<br/>
-<input type="submit" value="Change"/>
-</form>
 <br/>
 <br/>
 Change password:
 <form method="post" action="./EditProfileGuest">
 	Password: <input type="password" name="pass"/>
 	Repeat password: <input type="password" name="rpass"/>
+	Old password: <input type="password" name = "opass"/>
 	<input type="hidden" value="p" name="type"/>
 	<input type="submit" value="Change"/>
 </form>

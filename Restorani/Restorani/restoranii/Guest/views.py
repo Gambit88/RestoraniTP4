@@ -10,6 +10,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.contrib.auth.decorators import user_passes_test,login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect
+from django.contrib.auth import authenticate
 
 # Create your views here.
 #registracija
@@ -142,15 +144,32 @@ def profile(request):
 @csrf_exempt
 @user_passes_test(guestCheck,login_url='./')
 def editprofile(request):
-	user = Guest.objects.only("name","surname","password"
 	change = request.POST.get('type')
 	if change=='n':
-		pass
+		user = Guest.objects.only("name").get(id = request.user.guest.id)
+		user.name = request.POST.get('name')
+		user.save()
 	if change=='s':
-		pass
-	if change=='e':
-		pass
+		user = Guest.objects.only("surname").get(id = request.user.guest.id)
+		user.surname = request.POST.get('surname')
+		user.save()
 	if change=='a':
-		pass
+		user = Guest.objects.only("address").get(id = request.user.guest.id)
+		user.address = request.POST.get('address')
+		user.save()
 	if change=='p':
-		pass
+		if authenticate(request, username=request.user.guest.email, password=request.POST.get('opass')) is not None:
+			if request.POST.get('pass')==request.POST.get('rpass'):
+				request.user.set_password(request.POST.get('pass'))
+				request.user.save()
+			else:
+				err = "Passwords do not match."
+				link = "./GuestProfile"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error':err , 'link':link}))
+		else:
+			err = "Current password is not correct."
+			link = "./GuestProfile"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error':err , 'link':link}))
+	return redirect('profileOfGuest')
