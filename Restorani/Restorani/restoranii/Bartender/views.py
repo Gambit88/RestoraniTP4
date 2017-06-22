@@ -29,7 +29,6 @@ def bartenderPage(request):
 @user_passes_test(bartenderCheck,login_url='./')
 def bartenderProfile(request):
 	bartender = Bartender.objects.get(email=request.user.username)
-	print(bartender.email)
 	link = "./bartenderHomePage"
 	template = loader.get_template("bartenderProfile.html")
 	return HttpResponse(template.render({'bartender': bartender, 'back': link}))
