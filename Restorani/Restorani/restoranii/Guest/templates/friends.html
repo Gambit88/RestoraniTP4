@@ -6,12 +6,14 @@
 <a href="./guestHomePage" >Home</a>  <a href="./RestaurantList" >Restaurant list</a>  Friends  <a href="./GuestProfile" >Profile</a>  <a href="./logout">Logout</a>
 <br/>
 <br/>
+<br/>
 <form method="post" action="./Friends">
-Email:<input type="text" name='email'/>   <input type="submit" value="Add a friend"/>
+Email:<input type="text" name='email'/><input name = "type" type="hidden" value="add"/>   <input type="submit" value="Add a friend"/>
 </form>
 <br/>
-<br/>
-Frends:
+<form method="get" action="./Friends">
+Filter by name/surname:<input type="text" name='starts' value='{{filter}}'/><input type="submit" value="Apply"/>
+</form>
 <br/>
 <table>
 <thead>
@@ -21,7 +23,9 @@ Frends:
 </thead>
 <tbody>
 	{%for friend in friends%}
-		<td>{{friend.name}} {{friend.surname}}</td><td>{{friend.email}}</td><td><form method="delete" action="./Friends"><input name = "identity" type="hidden" value="{{friend.id}}"/><input type="submit" value="Remove"/></form></td>
+		<tr>
+		<td>{{friend.name}} {{friend.surname}}</td><td>{{friend.email}}</td><td><form method="post" action="./Friends"><input name = "type" type="hidden" value="del"/><input name = "identity" type="hidden" value="{{friend.id}}"/><input type="submit" value="Remove"/></form></td>
+		</tr>
 	{%endfor%}
 </tbody>
 </table>

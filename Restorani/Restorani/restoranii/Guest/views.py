@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import user_passes_test,login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate
+from django.db.models import Q
 
 # Create your views here.
 #registracija
@@ -120,13 +121,28 @@ def guestPage(request):
 @user_passes_test(guestCheck,login_url='./')
 def friends(request):
 	if request.method=="GET":
-		friendList = request.user.guest.friends.all()
+		text = request.GET.get('starts')
+		if text is None:
+			text = ""
+		friendList = request.user.guest.friends.filter(Q(name__startswith=text)|Q(surname__startswith=text))
 		template = loader.get_template("friends.html")
-		return HttpResponse(template.render({'friends':friendList}))
-	if request.method=="DELETE":
-		pass
+		return HttpResponse(template.render({'friends':friendList , 'filter':text}))
 	if request.method=="POST":
-		pass
+		if request.POST.get("type")=='add':
+			try:
+				friend = Guest.objects.get(email=request.POST.get('email'))
+				request.user.guest.friends.add(friend)
+				return redirect('friendsList')
+			except:
+				err = "No user with such email address."
+				link = "./Friends"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error':err , 'link':link}))
+		else:
+			friend = Guest.objects.get(id=request.POST.get("identity"))
+			request.user.guest.friends.remove(friend)
+			return redirect('friendsList')
+		
 
 #restaurant list
 @user_passes_test(guestCheck,login_url='./')

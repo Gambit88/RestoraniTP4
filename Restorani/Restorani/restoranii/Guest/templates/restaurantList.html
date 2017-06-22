@@ -14,7 +14,9 @@
 </thead>
 <tbody>
 	{%for restaurant in restaurants%}
+		<tr>
 		<td>{{restaurant.name}} </td><td>{{restaurant.type}} </td><td>{{restaurant.address}} </td><td><form method="post" action="./Reserve"><input name = "identity" type="hidden" value="{{restaurant.id}}"/><input type="submit" value="Reserve"/></form></td>
+		</tr>
 	{%endfor%}
 </tbody>
 </table>

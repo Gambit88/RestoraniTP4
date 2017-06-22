@@ -16,7 +16,9 @@ Restaurant visits:
 </thead>
 <tbody>
 	{%for visit in visits%}
+		<tr>
 		<td>{{visit.restaurant.name}} </td><td>{{visit.date}} </td><td>{{visit.duration}} </td>
+		</tr>
 	{%endfor%}
 	<td>&nbsp </td><td>&nbsp </td><td>&nbsp </td>
 </tbody>
