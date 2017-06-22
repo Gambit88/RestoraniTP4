@@ -46,7 +46,7 @@ def editCookProfile(request):
 
 @user_passes_test(cookCheck,login_url='./')
 @csrf_exempt
-def changePassword(request):
+def changeCookPassword(request):
 	new = request.POST.get('newPass')
 	repeat = request.POST.get('repPass')
 	print(request.user.username)

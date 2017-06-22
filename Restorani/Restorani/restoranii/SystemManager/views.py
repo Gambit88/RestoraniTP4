@@ -51,7 +51,7 @@ def registarRestaurant(request):
 
 #registracija menadzera restorana
 @csrf_exempt
-@user_passes_test(SystemManCheck,login_url='./')
+#@user_passes_test(SystemManCheck,login_url='./')
 def registarRestaurantMan(request):
 	list = Restaurant.objects.all()
 	managers = RestaurantManager.objects.all()

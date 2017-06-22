@@ -6,5 +6,5 @@ urlpatterns = [
 	url(r'^cookHomePage', views.cookPage, name = "cookHomePage"),
 	url(r'^cookProfile', views.cookProfile, name = "cookProfile"),
 	url(r'^editCookProfile', views.editCookProfile, name = "editCookProfile"),
-	url(r'^editCookPassword', views.changePassword, name = "editCookPassword"),
+	url(r'^editCookPassword', views.changeCookPassword, name = "editCookPassword"),
 ]

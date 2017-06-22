@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bartender Profile</title>
+</head>
+<body>
+    <form method = post action = "./editBartenderProfile">
+        <table>
+            <tr>
+                <td>Name</td>
+                <td><input value = {{bartender.name}} name = "name"></td>
+            </tr>
+            <tr>
+                <td>Surname</td>
+                <td><input value = {{bartender.surname}} name = "surname"></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{bartender.email}}</td>
+            </tr>
+            <tr>
+                <td>Restaurant</td>
+                <td>{{bartender.restaurant.name}}</td>
+            </tr>
+            <tr>
+                <td>Size</td>
+                <td> <select name="size" >
+                    <option selected disabled hidden>{{bartender.size}}</option>
+                    <option> Woman S </option>
+                    <option> Woman M </option>
+                    <option> Woman L </option>
+                    <option> Male S </option>
+                    <option> Male M </option>
+                    <option> Male L </option>
+                 </select> </td>
+            </tr>
+            <tr>
+                <td>Shoe Size</td>
+                <td><input type="number" value = {{bartender.shoeSize}} name="shoeSize"/></td>
+            </tr>
+            <tr><td></td><td><input type="submit" value="Change"/></td></tr>
+        </table>
+    </form>
+    <form method = "post" action="./editBartenderPassword">
+        <table>
+            <tr>
+                <td>Old Password</td>
+                <td><input name = "oldPass"></td>
+            </tr>
+            <tr>
+                <td>New Password</td>
+                <td><input name = "newPass"></td>
+            </tr>
+            <tr>
+                <td>Repeat Password</td>
+                <td><input name = "repPass"></td>
+            </tr>
+            <tr><td></td><td><input type = submit value = Change></td></tr>
+        </table>
+    </form>
+    <br>
+    <br>
+    <a href = "{{back}}">Back</a>
+
+</body>
+</html>
