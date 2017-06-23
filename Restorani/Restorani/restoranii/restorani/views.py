@@ -68,17 +68,9 @@ def logOut(request):
 def firstLogin(request):
 	password = request.POST.get('password', False)
 	repeatPass = request.POST.get('passwordR', False)
-	if (request.user.first_name == "COOK"):
-		template = loader.get_template("cookHomePage.html")
-		link = "./cookHomePage"
-	if (request.user.first_name == "BARTENDER"):
-		template = loader.get_template("bartenderHomePage.html")
-		link = "./bartenderHomePage"
-	if (request.user.first_name == "WAITER"):
-		template = loader.get_template("waiterHomePage.html")
-		link = "./waiterHomePage"
 	if not password:
 		err = "Password has not been submited."
+		link = "./changePassword"
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	if not repeatPass:
@@ -91,9 +83,10 @@ def firstLogin(request):
 		request.user.set_password(password);
 		request.user.last_name = False
 		request.user.save()
-		return HttpResponse(template.render())
+		return redirect("./")
 	else:
 		err = "Passwords do not match!"
+		link = "./changePassword"
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 @csrf_exempt	
