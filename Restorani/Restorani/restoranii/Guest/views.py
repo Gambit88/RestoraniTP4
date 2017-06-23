@@ -11,8 +11,12 @@ from email.mime.text import MIMEText
 from django.contrib.auth.decorators import user_passes_test,login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.db.models import Q
+from geopy.geocoders import Nominatim
+from geopy.distance import vincenty
+from django.template.defaulttags import register
+from restorani.models import RatingRestaurant
 
 # Create your views here.
 #registracija
@@ -65,11 +69,24 @@ def registerGuests(request):
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error':err , 'link':link}))
 		##############################################################################
+		geolocator = Nominatim()
+		try:
+			location = geolocator.geocode(request.user.guest.address)
+		except:
+			err = "Address could not be located at this moment."
+			link = "./guestRegister"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error':err , 'link':link}))
+		if location is None:
+			error = 'Address could not be located, try using your countrys language.'
+			link = "./GuestProfile"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
 		try:
 			user = User.objects.create_user(username = email, password = request.POST.get('password'))
 			user.first_name="GUEST"
 			user.save()
-			guest = Guest.objects.create(user=user, name=request.POST.get('name'), surname=request.POST.get('surname'), address=request.POST.get('address'), email=request.POST.get('email'),activated=False)
+			guest = Guest.objects.create(user=user, name=request.POST.get('name'), surname=request.POST.get('surname'), address=request.POST.get('address'), email=request.POST.get('email'),activated=False, lat=location.latitude, long=location.longitude)
 		except IntegrityError:
 			err = "E-mail already exists"
 			link = "./"
@@ -147,9 +164,74 @@ def friends(request):
 #restaurant list
 @user_passes_test(guestCheck,login_url='./')
 def restaurantList(request):
-	restaurants = Restaurant.objects.defer("name","id","type","address")
+	type = request.GET.get('sort')
+	way = request.GET.get('asc')
+	print(type,way)
+	distance = {}
+	rats = {}
+	frats = {}
+	restaurants = Restaurant.objects.defer("name","id","type","address","lat","long")
+	#svi za rating prijatelja
+	peopleList = []
+	peopleList.append(request.user.guest.id)
+	for friend in request.user.guest.friends.all():
+		peopleList.append(friend)
+	#proracunaj distancu i rejting za svaki restoran
+	for rest in restaurants:
+		ratings = RatingRestaurant.objects.filter(id=rest.id)
+		
+		avrRate = 0
+		avrFRate = 0
+		numr = 0
+		numfr = 0
+		
+		for rating in ratings:
+			avrRate = avrRate + rating.rating
+			numr = numr + 1
+			if rating.guest.id in peopleList:
+				avrFRate = avrFRate + rating.rating
+				numfr = numfr + 1
+		if numr!=0:
+			avrRate = avrRate/numr
+		if numfr!=0:
+			avrFRate = avrFRate/numfr
+		
+		rats[rest.id]=avrRate
+		frats[rest.id]=avrFRate
+		distance[rest.id]=vincenty((request.user.guest.lat, request.user.guest.long), (rest.lat,rest.long)).kilometers
+	
+	if type is None:
+		type="name"
+	if way is None:
+		way="asc"
+	if type=="name":
+		if way=="asc":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: restaurant.name.lower())
+		if way=="des":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: restaurant.name.lower(),reverse=True)
+	if type=="type":
+		if way=="asc":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: restaurant.type.lower())
+		if way=="des":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: restaurant.type.lower(),reverse=True)
+	if type=="distance":
+		if way=="asc":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: distance[restaurant.id])
+		if way=="des":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: distance[restaurant.id],reverse=True)
+	if type=="rating":
+		if way=="asc":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: rats[restaurant.id])
+		if way=="des":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: rats[restaurant.id],reverse=True)
+	if type=="frating":
+		if way=="asc":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: frats[restaurant.id])
+		if way=="des":
+			sortedRestaurants = sorted(restaurants, key= lambda restaurant: frats[restaurant.id],reverse=True)
+	print(distance)
 	template = loader.get_template("restaurantList.html")
-	return HttpResponse(template.render({'restaurants':restaurants}))
+	return HttpResponse(template.render({'restaurants':sortedRestaurants,'distances':distance, 'ratings':rats, 'fratings':frats}))
 #profile
 @user_passes_test(guestCheck,login_url='./')
 def profile(request):
@@ -170,14 +252,30 @@ def editprofile(request):
 		user.surname = request.POST.get('surname')
 		user.save()
 	if change=='a':
-		user = Guest.objects.only("address").get(id = request.user.guest.id)
+		geolocator = Nominatim()
+		try:
+			location = geolocator.geocode(request.POST.get('address'))
+		except:
+			err = "Address could not be located at this moment."
+			link = "./GuestProfile"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error':err , 'link':link}))
+		if location is None:
+			error = 'Address could not be located, try using your countrys language.'
+			link = "./GuestProfile"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		user = Guest.objects.only("address","long","lat").get(id = request.user.guest.id)
 		user.address = request.POST.get('address')
+		user.long = location.longitude
+		user.lat = location.latitude
 		user.save()
 	if change=='p':
 		if authenticate(request, username=request.user.guest.email, password=request.POST.get('opass')) is not None:
-			if request.POST.get('pass')==request.POST.get('rpass'):
+			if request.POST.get('pass')==request.POST.get('rpass') and request.POST.get('pass')!="":
 				request.user.set_password(request.POST.get('pass'))
 				request.user.save()
+				login(request,request.user)
 			else:
 				err = "Passwords do not match."
 				link = "./GuestProfile"
@@ -189,3 +287,34 @@ def editprofile(request):
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error':err , 'link':link}))
 	return redirect('profileOfGuest')
+
+	
+@register.filter
+def get_item(dict,key):
+	return dict.get(key)
+@register.filter
+def get_stars(dict,key):
+	val = dict.get(key)
+	if val is None:
+		return "-"
+	if val<0.5:
+		return "-"
+	if val<1:
+		return "'"
+	if val<1.5:
+		return "*"
+	if val<2:
+		return "*'"
+	if val<2.5:
+		return "**"
+	if val<3:
+		return "**'"
+	if val<3.5:
+		return "***"
+	if val<4:
+		return "***'"
+	if val<4.5:
+		return "****"
+	if val<5:
+		return "****'"
+	return "*****"

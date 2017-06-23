@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test,login_required
 from django.views.decorators.csrf import csrf_exempt
+from geopy.geocoders import Nominatim
 # Create your views here.
 
 #uslov za pristump stranici kao menadzer sistema
@@ -45,7 +46,20 @@ def registarRestaurant(request):
 			link = "./restaurantReg"
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error': error, 'link': link}))
-		restaurant = Restaurant.objects.create(name = request.POST.get('name'), type = request.POST.get('type'), address =request.POST.get('address') , sizeX = request.POST.get('dimX'), sizeY = request.POST.get('dimY'))
+		geolocator = Nominatim()
+		try:
+			location = geolocator.geocode(request.POST.get('address'))
+		except:
+			error = 'Address could not be located at this time.'
+			link = "./restaurantReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		if location is None:
+			error = 'Address could not be located, try using your countrys language.'
+			link = "./restaurantReg"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		restaurant = Restaurant.objects.create(name = request.POST.get('name'), type = request.POST.get('type'), address =request.POST.get('address') , sizeX = request.POST.get('dimX'), sizeY = request.POST.get('dimY'), long=location.longitude, lat=location.latitude)
 	template = loader.get_template("restaurantReg.html")
 	return HttpResponse(template.render({'lista': list}))
 

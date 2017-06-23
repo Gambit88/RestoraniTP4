@@ -8,6 +8,8 @@ class Restaurant(models.Model):#done
 	address = models.CharField(max_length = 50, null=True)
 	sizeX = models.IntegerField()
 	sizeY = models.IntegerField()
+	long = models.FloatField(default=0.0)
+	lat = models.FloatField(default=0.0)
 
 class Beaverage(models.Model):#done
 	name = models.CharField(max_length = 50)
@@ -57,6 +59,8 @@ class Guest(models.Model):#done
 	email = models.EmailField(max_length = 250)
 	activated = models.BooleanField()
 	address = models.CharField(max_length = 250)
+	long = models.FloatField(default=0.0)
+	lat = models.FloatField(default=0.0)
 	reservations = models.ManyToManyField(Reservation)
 	friends = models.ManyToManyField("Guest")
 	
@@ -90,6 +94,7 @@ class RatingFood(models.Model):#done
 class RatingRestaurant(models.Model):#done
 	rating = models.IntegerField()
 	restaurant = models.ForeignKey(Restaurant)
+	guest = models.ForeignKey(Guest, null=True)
 	
 class RatingServices(models.Model):#done
 	rating = models.IntegerField()

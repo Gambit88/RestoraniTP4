@@ -6,16 +6,23 @@
 <a href="./guestHomePage" >Home</a>  Restaurant list  <a href="./Friends" >Friends</a> <a href="./GuestProfile" >  Profile</a>  <a href="./logout">Logout</a>
 <br/>
 <br/>
+Order by:<br/>
+	<a href='./RestaurantList?sort=name&asc=asc'>Name</a>   <a href='./RestaurantList?sort=type&asc=asc'>Type</a>   <a href='./RestaurantList?sort=distance&asc=asc'>Distance</a>   <a href='./RestaurantList?sort=rating&asc=asc'>Rating</a>   <a href='./RestaurantList?sort=frating&asc=asc'>Friends rating</a>
+	<br/>
+	Reverse order by:<br/>
+	<a href='./RestaurantList?sort=name&asc=des'>Name</a>   <a href='./RestaurantList?sort=type&asc=des'>Type</a>   <a href='./RestaurantList?sort=distance&asc=des'>Distance</a>   <a href='./RestaurantList?sort=rating&asc=des'>Rating</a>   <a href='./RestaurantList?sort=frating&asc=des'>Friends rating</a>
+	<br/>
+<br/>
 <table>
 <thead>
 	<tr>
-		<th>Restaurant</th><th>Type</th><th>Address</th><th>Reserve</th>
+		<th>Restaurant</th><th>Type</th><th>Address</th><th>Distance(km)</th><th>Rating</th><th>Friends rating</th><th>Reserve</th>
 	</tr>
 </thead>
 <tbody>
 	{%for restaurant in restaurants%}
 		<tr>
-		<td>{{restaurant.name}} </td><td>{{restaurant.type}} </td><td>{{restaurant.address}} </td><td><form method="post" action="./Reserve"><input name = "identity" type="hidden" value="{{restaurant.id}}"/><input type="submit" value="Reserve"/></form></td>
+		<td>{{restaurant.name}} </td><td>{{restaurant.type}} </td><td>{{restaurant.address}} </td><td>{{distances|get_item:restaurant.id|floatformat:3}}</td><td>{{ratings|get_stars:restaurant.id}}</td><td>{{fratings|get_stars:restaurant.id}}</td><td><form method="post" action="./Reserve"><input name = "identity" type="hidden" value="{{restaurant.id}}"/><input type="submit" value="Reserve"/></form></td>
 		</tr>
 	{%endfor%}
 </tbody>
