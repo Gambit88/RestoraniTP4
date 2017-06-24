@@ -4,6 +4,7 @@ from django.template import loader
 from restorani.models import Guest
 from restorani.models import Reservation
 from restorani.models import Restaurant
+from django.contrib.auth.models import User
 import smtplib
 import _thread
 from email.mime.multipart import MIMEMultipart
@@ -17,6 +18,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import vincenty
 from django.template.defaulttags import register
 from restorani.models import RatingRestaurant
+from validate_email import validate_email
 
 # Create your views here.
 #registracija
@@ -38,6 +40,7 @@ def registerGuests(request):
 			link = "./guestRegister"
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error':err , 'link':link}))
+		
 		try:
 			validate_email(email)
 			valid_email = True
@@ -71,7 +74,7 @@ def registerGuests(request):
 		##############################################################################
 		geolocator = Nominatim()
 		try:
-			location = geolocator.geocode(request.user.guest.address)
+			location = geolocator.geocode(request.POST.get('address'))
 		except:
 			err = "Address could not be located at this moment."
 			link = "./guestRegister"
@@ -127,6 +130,7 @@ def activateGuest(request):
 def guestCheck(user):
 	return user.first_name=="GUEST"
 #home stranica za goste
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def guestPage(request):
 	template = loader.get_template("guestHomepage.html")
@@ -135,6 +139,7 @@ def guestPage(request):
 
 #friends
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def friends(request):
 	if request.method=="GET":
@@ -162,11 +167,11 @@ def friends(request):
 		
 
 #restaurant list
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def restaurantList(request):
 	type = request.GET.get('sort')
 	way = request.GET.get('asc')
-	print(type,way)
 	distance = {}
 	rats = {}
 	frats = {}
@@ -233,6 +238,7 @@ def restaurantList(request):
 	template = loader.get_template("restaurantList.html")
 	return HttpResponse(template.render({'restaurants':sortedRestaurants,'distances':distance, 'ratings':rats, 'fratings':frats}))
 #profile
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def profile(request):
 	template = loader.get_template("guestProfile.html")
@@ -240,6 +246,7 @@ def profile(request):
 	
 #edit profile data
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def editprofile(request):
 	change = request.POST.get('type')
