@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{rest.name}}</title>
+</head>
+<style>
+input.size{
+  width: 20px;
+  height: 20px;
+  margin: 0 15px 30px 0;
+}
+</style>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+    {% for i in rangeX%}
+    <br>
+        {% for j in rangeY%}
+            {% for x in tlist%}
+                {% if i == x.posX and j == x.posY%}
+                    <input type="text" name="table" class="size" value="{{x.num}}"/>
+                {%endif%}
+            {%endfor%}
+        {%endfor%}
+    {%endfor%}
+    <br> <br>
+    <form action="tables" method="post">
+        TableNo: <input type="number" name="table"/> <br><br>
+        Segment: <select name="r"> {%for l in segments %} <option>  {{l.name}} </option> {%endfor%} </select> <br><br>
+        ChairNo: <input type="number" name="chair"/> <br><br>
+        PositionX: <input type="number" name="x"/> <br><br>
+        PostitionY: <input type="number" name="y"/> <br><br>
+        <input type="submit" value="Add">
+    </form>
+
+</body>
+</html>

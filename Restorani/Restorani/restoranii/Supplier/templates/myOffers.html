@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Offers</title>
+</head>
+<style>
+    table.cen{
+        text-align: center;
+    }
+</style>
+<body>
+    <table class="cen">
+        <tr>
+            <td> Content </td>
+            <td> Expiration Date </td>
+            <td> Price </td>
+            <td> Acepted </td>
+            <td></td>
+        </tr>
+        {% for l in offers%}
+            <form action="updateOffer" method="get">
+                <tr>
+                    <td> {{l.post.content}}</td>
+                    <td> {{l.post.expiration_date}}</td>
+                    <td> {{l.price}}</td>
+                    {%if l.acepted == False%}
+                        <td> No </td>
+                    {%else%}
+                        <td> Yes </td>
+                    {%endif%}
+                    <td> <input name="addid" type="hidden" value={{l.pk}}> <input type="submit" value="Change"> </td>
+                </tr>
+            </form>
+        {%endfor%}
+    </table>
+</body>
+</html>

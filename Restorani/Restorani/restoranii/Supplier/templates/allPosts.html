@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="supplierHomePage"> Back </a> <br> <br>
+    <br><br>
+    <table>
+        <tr>
+            <td> Content </td>
+            <td> Expiration Date </td>
+            <td> Add Your Offer </td>
+            <td></td>
+        </tr>
+        {% for l in posts %}
+            <form action="allPosts" method="post">
+                <tr>
+                    <td> {{l.content}} </td>
+                    <td> {{l.expiration_date}} </td>
+                    <td> <input type="number" name="price" required> RSD </td>
+                    <td> <input name="addid" type="hidden" value={{l.pk}}> <input type="submit" value="Add"> </td>
+                </tr>
+            </form>
+        {%endfor%}
+    </table>
+</body>
+</html>

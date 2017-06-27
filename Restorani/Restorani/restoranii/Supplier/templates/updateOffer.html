@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+     <table class="cen">
+        <tr>
+            <td> Content </td>
+            <td> Expiration Date </td>
+            <td> Price </td>
+            <td> Acepted </td>
+        </tr>
+        <tr>
+            <td> {{offer.post.content}}</td>
+            <td> {{offer.post.expiration_date}}</td>
+            <td> {{offer.price}}</td>
+            {%if offer.acepted == False%}
+                <td> No </td>
+            {%else%}
+                <td> Yes </td>
+            {%endif%}
+            </tr>
+    </table>
+    <br> <br>
+     <form action="updateOffer" method="post">
+        <table>
+            <tr>
+                <td> Change Price: </td>
+                <td> <input name="newprice" type="number"> RSD</td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input name="addid" type="hidden" value={{offer.pk}}> <input type="submit" value="Change"> </td>
+            </tr>
+        </table>
+     </form>
+
+</body>
+</html>

@@ -8,4 +8,7 @@ urlpatterns = [
 	url(r'^meal', views.food),
 	url(r'^supplier', views.supplier),
 	url(r'^updateRestaurant', views.updateRest),
+	url(r'^segments', views.addSegment),
+	url(r'^tables', views.tableLayout),
+	url(r'^order', views.managerOrder),
 ]

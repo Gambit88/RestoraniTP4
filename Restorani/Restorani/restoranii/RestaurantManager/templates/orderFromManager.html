@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{rest.name}}</title>
+</head>
+<style>
+input.size{
+  width: 200px;
+  height: 200px;
+}
+</<style>
+</style>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+    Restaurant: {{rest.name}} <br> <br>
+    <table>
+        <tr>
+            <td> Order </td>
+
+            <td> Expiration Date </td>
+        </tr>
+        {%for l in posts %}
+            <tr>
+                <td>{{l.content}}</td>
+                <td>{{l.expiration_date}}</td>
+            </tr>
+        {%endfor%}
+    </table>
+
+    <br><br>
+    <form action="order" method="post">
+        <table>
+            <tr>
+                <td> Order: </td>
+                <td> <textarea name="name"></textarea> </td>
+            </tr>
+            <tr>
+                <td> Expiration Date: </td>
+                <td> <input type="text" name="date"> (yyyy-mm-dd hh:mm) </td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input type="submit" value="Order"> </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
