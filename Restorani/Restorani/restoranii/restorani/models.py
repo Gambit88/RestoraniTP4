@@ -71,7 +71,6 @@ class Guest(models.Model):  # done
     address = models.CharField(max_length=250)
     long = models.FloatField(default=0.0)
     lat = models.FloatField(default=0.0)
-    reservations = models.ManyToManyField(Reservation)
     friends = models.ManyToManyField("Guest")
 
 
@@ -159,5 +158,6 @@ class TableHelp():
     posY = 0
     status = False
     num = ""
+    chairs = 0
     id = None
     segment = ""

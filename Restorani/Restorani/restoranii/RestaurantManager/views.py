@@ -40,7 +40,6 @@ def restaurantManagerHome(request):
 def registarEmployee(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
 	restaurantID = Restaurant.objects.get(name = manager.restaurant.name)
-	print(restaurantID.name)
 	employees = Employee.objects.filter(restaurant = restaurantID.pk)
 	if request.method == 'POST':
 		if not request.POST.get('name'):
@@ -229,7 +228,7 @@ def tableLayout(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
 	restaurant = Restaurant.objects.get(pk = manager.restaurant_id)
 	allSegments = Segment.objects.filter(restaurant=restaurant.pk)
-	tables = RestaurantTable.objects.all()
+	tables = RestaurantTable.objects.filter(restaurant = restaurant)
 	tableX = []
 	tableY = []
 	for t in tables:

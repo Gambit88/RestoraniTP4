@@ -1,0 +1,64 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+function tButtonClick(chairs, segment, tableNum, tableId){
+document.getElementById("textSpanCh").textContent = chairs;
+document.getElementById("textSpanSg").textContent = segment;
+document.getElementById("textSpanNm").textContent = tableNum;
+document.getElementById("tableID").setAttribute("value", tableId);
+document.getElementById("addButton").removeAttribute("disabled");
+}
+function addtable(){
+var value = document.getElementById('tableID').value;
+var value2 = document.getElementById('tableIds').value;
+value2= value2 +' '+ value;
+
+var tableNum = document.getElementById('textSpanNm').textContent;
+var tn = tableNum
+var tableNumAll = document.getElementById('textSpan').textContent;
+tableNum = tableNumAll+' '+tableNum;
+document.getElementById("textSpan").textContent = tableNum;
+document.getElementById('tableIds').setAttribute("value",value2);
+document.getElementById("tableB"+tn).setAttribute("disabled", "disabled");
+document.getElementById("addButton").setAttribute("disabled", "disabled");
+
+}
+</script>
+</head>
+<body>
+Reservation for restaurant: {{name}}
+<br/>
+<br/>
+Date: {{dandt}}
+<br/>
+<br/>
+Duration: {{duration}} hours
+<br/>
+<br/>
+Pick tables:
+<br/>
+{% for i in listI%}
+<br/><br/>
+{% for j in listJ%}{% for table in tables%}{% if i == table.posX and j == table.posY%}<button id="tableB{{table.num}}"{%if table.status == False%}disabled="True"{%endif%} onclick=tButtonClick({{table.chairs}},'{{table.segment}}',{{table.num}},{{table.id}})>{%if table.num == ""%}&nbsp;&nbsp;{%else%}{{table.num}}{%endif%}</button>&nbsp;{%endif%}{%endfor%}{%endfor%}{%endfor%}
+<br/>
+<br/>
+Table number: <span id="textSpanNm"></span> &nbsp; Table chairs: <span id="textSpanCh"></span> &nbsp; Segment: <span id="textSpanSg"></span>
+<input type="hidden" id="tableID"/>
+<br/><br/>
+<button onclick="addtable()" disabled="True" id="addButton">Add table</button>
+<br/>
+<br/>
+Tables to reserve: <span id="textSpan"></span>
+<br/>
+<br/>
+<form method="post" action="./friendPick">
+<input type="hidden" name="tableIds" value="" id="tableIds">
+<input type="hidden" value="{{id}}" name="identity">
+<input type="hidden" name="dandt" value="{{dandt}}"><input type="hidden" name="duration" value="{{duration}}"><input type="hidden" name="chairs" value="0" id="chairs">
+<input type="button" onclick="window.location='./RestaurantList';" value="Cancel"/>&nbsp;&nbsp;&nbsp;<input type="submit" value="Proceed">
+</form>
+<br/>
+<br/>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+function fn(){
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth()+1; //January is 0!
+var yyyy = today.getFullYear();
+var hh = today.getHours();
+var nn = today.getMinutes();
+if(hh!=23){
+hh = hh+1;
+}else{
+hh = 0;
+}
+if(dd<10){
+	dd='0'+dd;
+} 
+if(mm<10){
+	mm='0'+mm;
+} 
+if(hh<10){
+	hh='0'+hh;
+}
+if(nn<10){
+	nn='0'+nn;
+}
+today = yyyy+'-'+mm+'-'+dd+'T'+hh+':'+nn;
+document.getElementById("aaa").setAttribute("min", today);
+document.getElementById("aaa").setAttribute("value", today);
+}
+window.onload = fn;
+</script>
+</head>
+<body>
+Reservation for restaurant: {{name}}
+<br/>
+<br/>
+<form method="post" action="./tablePick">
+<input type="hidden" value="{{id}}" name="identity">
+Reservation time: <input type="datetime-local" name="dandt" id="aaa">
+<br/>
+<br/>
+Duration(in hours): <input type="number" min="1" max="24" name="duration">
+<br/>
+<br/>
+<input type="button" onclick="window.location='./RestaurantList';" value="Cancel"/>&nbsp;&nbsp;&nbsp;<input type="submit" value="Proceed">
+</form>
+<br/>
+<br/>
+</body>
+</html>

@@ -4,6 +4,7 @@ from django.template import loader
 from restorani.models import Guest
 from restorani.models import Reservation
 from restorani.models import Restaurant
+from restorani.models import RestaurantTable
 from django.contrib.auth.models import User
 import smtplib
 import _thread
@@ -19,6 +20,8 @@ from geopy.distance import vincenty
 from django.template.defaulttags import register
 from restorani.models import RatingRestaurant
 from validate_email import validate_email
+from restorani.models import TableHelp
+from datetime import datetime, timedelta
 
 # Create your views here.
 #registracija
@@ -294,7 +297,97 @@ def editprofile(request):
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error':err , 'link':link}))
 	return redirect('profileOfGuest')
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def res_part1(request):
+	rest = Restaurant.objects.only("id","name").get(id=request.POST.get('identity'))
+	template = loader.get_template("reservation.html")
+	return HttpResponse(template.render({'name':rest.name,'id':rest.id}))
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def res_part2(request):
+	tlist = []
+	dandt = request.POST.get('dandt').split('T')[0] +' '+ request.POST.get('dandt').split('T')[1]
+	duration = request.POST.get('duration')
+	startTime = dandt
+	endTime = add_time(dandt,3)
+	restaurant = Restaurant.objects.get(id = request.POST.get('identity'))
+	tables = RestaurantTable.objects.filter(restaurant = restaurant)
+	#Kroz celu velicinu restorana
+	for i in range(restaurant.sizeX):
+		for j in range(restaurant.sizeY):
+			test = True
+			#za stolove koji postoje
+			if tables is not None:
+				for table in tables:
+					#za pronadjeni sto na datoj poziciji
+					if i==table.posX and j==table.posY:
+						tableH = TableHelp()
+						#preuzmi rezervacije za taj sto, koje su aktivne u datom restoranu
+						reservations = Reservation.objects.only("date","duration").filter(restaurant= restaurant, complete = False, restaurantTables__id=table.id)
+						#ako ih nema onda je sto slobodan
+						if reservations is None:
+							tableH.status = True
+						#ako ih ima treba proveriti
+						else:
+							test2 = True
+							#za svaku rezervaciju
+							for resr in reservations:
+								#sa pocetkom i krajem
+								tableStart = resr.date
+								tableEnd = add_time(tableStart,resr.duration)
+								#proveri da li rezervacija pocinje pre kraja moje i da li se zavrsava nakon mog pocetka
+								if tableStart <= endTime and tableEnd >= startTime:
+									#ako da sto je iskljucen
+									tableH.status = False
+									test2 = False
+							if test2:
+								tableH.status = True
+						#ostatak koda :)
+						tableH.posX=i
+						tableH.posY=j
+						tableH.num = table.tableNo
+						tableH.segment = table.segment.name
+						tableH.id = table.id
+						tableH.chairs = table.chairNo
+						tlist.append(tableH)
+						test = False
+			#i ako ih nema
+			if test:
+				tableH = TableHelp()
+				tableH.posX=i
+				tableH.posY=j
+				tableH.status = False
+				tableH.num = ""
+				tableH.segment = ""
+				tableH.chairs = 0
+				tableH.id = -1
+				tlist.append(tableH)
+	template = loader.get_template("restablepick.html")
+	return HttpResponse(template.render({'name':restaurant.name,'id':restaurant.id,'dandt':dandt,'duration':duration,'tables':tlist,'listI':list(range(0, restaurant.sizeX)),'listJ':list(range(0,restaurant.sizeY))}))
+	
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def res_part3(request):
+	print(str(request.POST.get('tableIds')))
+	print(1)
+	return HttpResponse("Done")
 
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def res_part4(request):
+	pass
+	
+def add_time(date,hour):
+	dt = datetime(day = int(date.split(' ')[0].split('-')[2]),month = int(date.split(' ')[0].split('-')[1]), year = int(date.split(' ')[0].split('-')[0]), hour = int(date.split(' ')[1].split(':')[0]), minute = int(date.split(' ')[1].split(':')[1]))
+	dt = dt + timedelta(hours=hour)
+	result = str(dt)
+	result = result.split(':')[0]+':'+result.split(':')[1]
+	return result
 	
 @register.filter
 def get_item(dict,key):
