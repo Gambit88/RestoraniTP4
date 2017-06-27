@@ -33,6 +33,9 @@ def index(request):
 			return redirect("bartenderHomePage")
 		if (request.user.first_name == "WAITER"):
 			return redirect("waiterHomePage")
+		if (request.user.first_name == "SUPPLIER"):
+			return redirect("supplierHomePage")
+			return redirect("supplierHomePage")
 @csrf_exempt
 #LogInFunkcija
 def loginRequest(request):

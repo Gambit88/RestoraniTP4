@@ -183,7 +183,7 @@ def updateRest(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
 	restaurant = Restaurant.objects.get(pk = manager.restaurant_id)
 	if request.method == "POST":
-		if not request.POST.get('name') or not request.POST.get('type'):
+		if not request.POST.get('name') and not request.POST.get('type'):
 			error = "You didn't input any changes"
 			link = "updateRestaurant.html"
 			template = loader.get_template("error.html")
