@@ -18,7 +18,7 @@ input.size{
         {% for j in rangeY%}
             {% for x in tlist%}
                 {% if i == x.posX and j == x.posY%}
-                    <input type="text" name="table" class="size" value="{{x.num}}"/>
+                    <input type="text" name="table" class="size" value="{{x.num}}" readonly/>
                 {%endif%}
             {%endfor%}
         {%endfor%}

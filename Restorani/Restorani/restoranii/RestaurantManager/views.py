@@ -275,7 +275,7 @@ def tableLayout(request):
 		template = loader.get_template("tables.html")
 		return HttpResponse(template.render(
 			{'rest': restaurant, 'segments': allSegments, 'rangeX': range(restaurant.sizeX),
-			 'rangeY': range(restaurant.sizeY)}))
+			 'rangeY': range(restaurant.sizeY), 'tlist': tlist}))
 
 @csrf_exempt
 @user_passes_test(restaurantManagerCheck,login_url='./')
