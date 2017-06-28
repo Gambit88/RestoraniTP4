@@ -20,41 +20,39 @@ function addDrink(){
     var value2 = document.getElementById('drinks').value;
     value2= value2 +' '+ value;
     document.getElementById('drinks').setAttribute("value",value2);
-
     var table = document.getElementById('drinkTable');
     var row = table.insertRow(0);
     var cell1 = row.insertCell(0);
     cell1.innerHTML = e.options[e.selectedIndex].text;
 }
+
 </script>
 </head>
 <body>
-    <table>
-
+    <form>
+        <table>
         <tr>
             <td>Food</td>
             <td> <select id="food"> {%for i in food %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
             <td><button onclick="addFood()" id="addButton1">Add Food</button></td>
         </tr>
-        <tr><table id = foodTable></table></tr>
+        <tr></tr>
         <tr>
             <td>Beverages</td>
             <td> <select id="drink"> {%for i in drinks %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
             <td><button onclick="addDrink()" id="addButton2">Add Beverage</button></td>
         </tr>
-        <tr><table id = drinkTable></table></tr>
     </table>
+    <table>{%for i in order.orderedfoods.all%}<tr><td>{{i.food.name}} x{{i.amount}}</td></tr>{%endfor%}</table>
+    <table id =  foodTable></table>
+    <table>{%for i in order.ordereddrinks.all%}<tr><td>{{i.beaverage.name}} x{{i.amount}}</td></tr>{%endfor%}</table>
+    <table id = drinkTable></table>
     <form method="post" action="./saveOrder">
-        <table>
-            <tr>
-                <td>Table Number</td>
-                <td> <select name="tableNo"> {%for i in tables %} <option> {{i.tableNo}} </option> {%endfor%} </select>
-            </td>
-        </tr>
-        </table>
-        <button id="addButton">Add Order</button>
+        <button id="editButton">Submit</button>
         <input type = hidden id = "foods" name = "foods">
         <input type = hidden id = "drinks" name = "drinks">
+        <input type = hidden name = orderID value = {{order.id}}>
+    </form>
     </form>
 </body>
 </html>

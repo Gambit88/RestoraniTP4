@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from restorani.models import Employee
 from restorani.models import Bartender
+from restorani.models import Order
 from django.template import loader
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -19,8 +20,9 @@ def bartenderCheck(employee):
 def bartenderPage(request):
 	if(request.user.last_name == "False"):
 		user = request.user.username
+		
 		template = loader.get_template("bartenderHomePage.html")
-		return HttpResponse(template.render({'user': user}))
+		return HttpResponse(template.render({'user': user,'orders':orders}))
 	else:
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())

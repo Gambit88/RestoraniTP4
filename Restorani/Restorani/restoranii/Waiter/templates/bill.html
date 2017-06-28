@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bill</title>
+</head>
+<body>
+    <table>
+        <tr><td colspan="2">Bill</td></tr>
+        <tr><td>Food</td></tr>
+        {%for i in order.orderedfoods.all%}
+        <tr><td>{{i.food.name}}</td><td>x{{i.amount}} {{i.food.price}} </td></tr>
+        {%endfor%}
+        <tr><td>Drinks</td></tr>
+        {%for i in order.ordereddrinks.all%}
+        <tr><td>{{i.beaverage.name}}</td><td>x{{i.amount}} {{i.beaverage.price}}</td></tr>
+        {%endfor%}
+        <tr><td>Total:</td><td align="right">{{total}}</td></tr>
+        <form method = post action = "./payOrder">
+            <tr><td><input type = submit value = Pay><input type = hidden name = orderID value = "{{order.id}}"></td></tr>
+        </form>
+    </table>
+</body>
+</html>

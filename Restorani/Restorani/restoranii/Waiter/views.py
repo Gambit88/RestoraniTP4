@@ -8,6 +8,7 @@ from restorani.models import Beaverage
 from restorani.models import Order
 from restorani.models import OrderedFood
 from restorani.models import OrderedDrink
+import json
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test, login_required
@@ -92,7 +93,7 @@ def addOrder(request):  ##### IZBRISATI TESTIRANJE
     tables = RestaurantTable.objects.filter(restaurant=restaurant)
     food = Food.objects.filter(restaurant=restaurant)
     drinks = Beaverage.objects.filter(restaurant=restaurant)
-    template = loader.get_template("addOrderPage.html")
+    template = loader.get_template("addOrder.html")
     return HttpResponse(template.render({'tables': tables, 'food': food, 'drinks': drinks}))
 
 
@@ -147,4 +148,45 @@ def saveOrder(request):
     user = request.user.username
     return HttpResponse(template.render({'user': user, 'order': orders}))
 
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def editOrder(request):
+	order_id = request.POST.get('orderID')
+	order = Order.objects.get(id = order_id)
+	waiter = Waiter.objects.get(email=request.user.username)
+	restaurant = request.user.employee.restaurant
+	tables = RestaurantTable.objects.filter(restaurant=restaurant)
+	food = Food.objects.filter(restaurant=restaurant)
+	drinks = Beaverage.objects.filter(restaurant=restaurant)
 
+	template = loader.get_template("editOrder.html")
+	return HttpResponse(template.render({'order': order,'food': food, 'drinks': drinks}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def createBill(request):
+	orderID = request.POST.get('orderID')
+	order = Order.objects.get(id = orderID)
+	total = 0
+	foodTotal = 0
+	drinkTotal = 0
+	for i in order.orderedfoods.all():
+		foodTotal += i.food.price * i.amount
+	for i in order.ordereddrinks.all():
+		drinkTotal += i.beaverage.price * i.amount
+	total = foodTotal + drinkTotal
+	template = loader.get_template('bill.html')
+	return HttpResponse(template.render({'order':order,'total':total}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def payOrder(request):
+	orderID = request.POST.get('orderID')
+	order = Order.objects.get(id=orderID)
+	order.paid = True
+	order.save()
+	user = request.user.username
+	waiter = Waiter.objects.get(email=request.user.username)
+	orders = Order.objects.filter(employees=waiter)
+	template = loader.get_template("waiterHomePage.html")
+	return HttpResponse(template.render({'order':orders, 'user': user}))

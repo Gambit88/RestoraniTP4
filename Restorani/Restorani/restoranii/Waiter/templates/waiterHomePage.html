@@ -13,19 +13,29 @@
     </form>
     <table border = 1>
         <tr>
-            <td colspan="4" align="center">Orders</td>
+            <td colspan="5" align="center">Orders</td>
         </tr>
         <tr>
             <td>Table Number</td>
             <td>Food</td>
             <td>Beverages</td>
-            <td>Paid</td>
+            <td colspan="2">Options</td>
         </tr>
         {%for i in order %} <tr>
             <td>{{i.table.tableNo}}</td>
             <td>{%for j in i.orderedfoods.all%}{{j.food.name}} x{{j.amount}}<br>{%endfor%}</td>
             <td>{%for j in i.ordereddrinks.all%}{{j.beaverage.name}} x{{j.amount}}<br>{%endfor%}</td>
-            <td>{%if i.paid%} Yes {%else%} No{%endif%}</td>
+            <td>{%if i.paid%} Paid {%else%} Not Paid{%endif%}</td>
+            {%if not i.paid%}
+            <form method = post action = "./editOrder">
+                <td><input type="submit" value = "Edit"><input type="hidden" name = "orderID" value = {{i.id}}></td>
+            </form>
+
+            <form method="post" action = "./createBill">
+                <td><input type="hidden" name = "orderID" value = {{i.id}}>
+                    <input type="submit" value = "Create Bill"></td>
+            </form>
+            {%endif%}
         </tr>>{%endfor%}
     </table>
 </body>
