@@ -1,0 +1,72 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+var globalFriends = 0;
+function addFriend(){
+var chairNo = {{chairNo}};
+var frendsIds = document.getElementById('friends').value;
+var e = document.getElementById('fren');
+var value = e.options[e.selectedIndex].value;
+var text = e.options[e.selectedIndex].text;
+var flist = document.getElementById('friendsList');
+if(value==-1){
+	return;
+}
+if(chairNo<=globalFriends){
+document.getElementById('addbutton').setAttribute('disabled','disable');
+return;
+}
+frendsIds = frendsIds + " " + value;
+document.getElementById('friends').setAttribute('value',frendsIds);
+flist.textContent = flist.textContent + "\n" + text;
+globalFriends = globalFriends +1;
+e.options[e.selectedIndex].disabled = true;
+e.selectedIndex = 0;
+if(chairNo<=globalFriends){
+document.getElementById('addbutton').setAttribute('disabled','disable');
+}
+}
+</script>
+</head>
+<body>
+Reservation for restaurant: {{name}}
+<br/>
+<br/>
+Date: {{dandt}}
+<br/>
+<br/>
+Duration: {{duration}} hours
+<br/>
+<br/>
+Tables: {{tableNums}}
+<br/>
+<br/>
+Number of chairs: {{chairNo}}
+<br/>
+<br/>
+Invited friends:
+<div id="friendsList" style="white-space:pre-wrap;">
+</div>
+<br/>
+<br/>
+Invite friends:
+<select id="fren">
+<option selected value = -1 ></option>
+{%for friend in friends%}
+<option value = {{friend.id}}>{{friend.name}} {{friend.surname}}</option>
+{%endfor%}
+</select>
+<button onclick=addFriend() id="addbutton">Add friend</button>
+<br/>
+<br/>
+<form method="post" action="./fullReserve">
+<input type="hidden" name="tableIds" value="{{tableIds}}" id="tableIds">
+<input type="hidden" value="{{id}}" name="identity">
+<input type="hidden" name="dandt" value="{{dandt}}"><input type="hidden" name="duration" value="{{duration}}"><input type="hidden" name="friends" value="" id="friends">
+<input type="button" onclick="window.location='./RestaurantList';" value="Cancel"/>&nbsp;&nbsp;&nbsp;<input type="submit" value="Reserve">
+</form>
+<br/>
+<br/>
+</body>
+</html>

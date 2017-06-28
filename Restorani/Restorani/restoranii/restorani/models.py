@@ -58,8 +58,7 @@ class Reservation(models.Model):  # done
     date = models.DateTimeField()
     duration = models.IntegerField()
     complete = models.BooleanField()
-    restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE, null=True)
-
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, null=True)
 
 class Guest(models.Model):  # done
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
@@ -72,7 +71,10 @@ class Guest(models.Model):  # done
     long = models.FloatField(default=0.0)
     lat = models.FloatField(default=0.0)
     friends = models.ManyToManyField("Guest")
-
+	
+class InviteList(models.Model):
+	reservation = models.OneToOneField(Reservation, null=True)
+	guests = models.ManyToManyField(Guest)
 
 class Post(models.Model):  # done
     content = models.CharField(max_length=500, null=True)

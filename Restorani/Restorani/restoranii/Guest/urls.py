@@ -12,4 +12,5 @@ urlpatterns = [
 	url(r'^Reserve',views.res_part1),
 	url(r'^tablePick',views.res_part2),
 	url(r'^friendPick', views.res_part3),
+	url(r'^fullReserve', views.res_part4),
 ]

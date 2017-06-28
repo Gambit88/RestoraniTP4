@@ -18,10 +18,11 @@ from django.db.models import Q
 from geopy.geocoders import Nominatim
 from geopy.distance import vincenty
 from django.template.defaulttags import register
-from restorani.models import RatingRestaurant
+from restorani.models import RatingRestaurant, InviteList
 from validate_email import validate_email
 from restorani.models import TableHelp
 from datetime import datetime, timedelta
+from django.db import connection
 
 # Create your views here.
 #registracija
@@ -137,7 +138,7 @@ def guestCheck(user):
 @user_passes_test(guestCheck,login_url='./')
 def guestPage(request):
 	template = loader.get_template("guestHomepage.html")
-	reservations = Reservation.objects.defer("restaurantTables").filter(guest= request.user.guest)
+	reservations = Reservation.objects.filter(guest__pk = request.user.guest.id)
 	return HttpResponse(template.render({'visits':reservations}))
 
 #friends
@@ -312,7 +313,7 @@ def res_part2(request):
 	dandt = request.POST.get('dandt').split('T')[0] +' '+ request.POST.get('dandt').split('T')[1]
 	duration = request.POST.get('duration')
 	startTime = dandt
-	endTime = add_time(dandt,3)
+	endTime = add_time(dandt,int(duration))
 	restaurant = Restaurant.objects.get(id = request.POST.get('identity'))
 	tables = RestaurantTable.objects.filter(restaurant = restaurant)
 	#Kroz celu velicinu restorana
@@ -336,7 +337,7 @@ def res_part2(request):
 							#za svaku rezervaciju
 							for resr in reservations:
 								#sa pocetkom i krajem
-								tableStart = resr.date
+								tableStart = str(resr.date)
 								tableEnd = add_time(tableStart,resr.duration)
 								#proveri da li rezervacija pocinje pre kraja moje i da li se zavrsava nakon mog pocetka
 								if tableStart <= endTime and tableEnd >= startTime:
@@ -372,16 +373,103 @@ def res_part2(request):
 @login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def res_part3(request):
-	print(str(request.POST.get('tableIds')))
-	print(1)
-	return HttpResponse("Done")
+	tids = request.POST.get('tableIds')
+	dandt = request.POST.get('dandt')
+	duration = request.POST.get('duration')
+	restaurant = Restaurant.objects.get(id = request.POST.get('identity'))
+	chairNo = request.POST.get('chairs')
+	tableNums = ""
+	for id in tids.split():
+		table = RestaurantTable.objects.get(id = id)
+		if table is not None:
+			tableNums += " "+str(table.tableNo)
+	
+	template = loader.get_template("friendPick.html")
+	friends = request.user.guest.friends.all()
+	return HttpResponse(template.render({'name':restaurant.name,'id':restaurant.id,'dandt':dandt,'duration':duration,'tableIds':tids,'chairNo':chairNo,'tableNums':tableNums,'friends':friends}))
 
 @csrf_exempt
 @login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def res_part4(request):
-	pass
+	rtableslist = []
+	tids = request.POST.get('tableIds')
+	dandt = request.POST.get('dandt')
+	duration = request.POST.get('duration')
+	restaurant = Restaurant.objects.get(id = request.POST.get('identity'))
+	friends = request.POST.get('friends')
+	flist = friends.split(' ')
+	tlist = tids.split(' ')
+	if len(flist) > 1:
+		flist = flist[1:]
+	else:
+		flist = None
+	if len(tlist) > 1:
+		tlist = tlist[1:]
+	else:
+		tlist = None
+	reservation = Reservation(restaurant = restaurant,complete=False,date = dandt,duration=duration)
+	if tlist is not None:
+		for tid in tlist:
+			table = RestaurantTable.objects.get(id=tid)
+			rtableslist.append(table)
+	startTime = dandt
+	endTime = add_time(dandt,int(duration))
+	#imam rezervaciju, zakljucati sto, proveriti da li je validna, ubaciti i otkljucati sto
+	cursor = connection.cursor()
+	#zakljucano
+	cursor.execute("LOCK TABLES restorani_reservation WRITE,restorani_reservation_restaurantTables WRITE")
+	#svi stolovi koje hocemo da rezervisemo
+	for table in rtableslist:
+		#izvadimo rezervacije koje imaju id stola, za taj restoran i aktivne su
+		reservations = Reservation.objects.only("date","duration").filter(restaurant= restaurant, complete = False, restaurantTables__id=table.id)
+		#ako ih nema onda je sto slobodan
+		if reservations is None:
+			pass
+		#ako ih ima treba proveriti
+		else:
+			#za svaku rezervaciju
+			for resr in reservations:
+				#sa pocetkom i krajem
+				tableStart = str(resr.date)
+				tableEnd = add_time(tableStart,resr.duration)
+				#proveri da li rezervacija pocinje pre kraja moje i da li se zavrsava nakon mog pocetka
+				if tableStart <= endTime and tableEnd >= startTime:
+					#ako da sto je nedostupan
+					#otkljucaj
+					cursor.execute("UNLOCK TABLES;")
+					err = "Jedan od izabranih stolova je u međuvremenu rezervisan."
+					link = "./"
+					template = loader.get_template("error.html")
+					return HttpResponse(template.render({'error':err , 'link':link}))
+	#otkljucano
+	cursor.execute("UNLOCK TABLES;")
+	reservation.save()
+	request.user.guest.reservations.add(reservation)
+	if tlist is not None:
+		for tid in tlist:
+			table = RestaurantTable.objects.get(id=tid)
+			reservation.restaurantTables.add(table)
+	invList = InviteList(reservation = reservation)
+	invList.save()
+	if flist is not None:
+		for fid in flist:
+			friend = Guest.objects.get(id=fid)
+			invList.guests.add(friend)
+	return redirect('guestHomePage')
 	
+	
+	
+	
+
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def res_confirm(request):
+	pass
+
+
+
 def add_time(date,hour):
 	dt = datetime(day = int(date.split(' ')[0].split('-')[2]),month = int(date.split(' ')[0].split('-')[1]), year = int(date.split(' ')[0].split('-')[0]), hour = int(date.split(' ')[1].split(':')[0]), minute = int(date.split(' ')[1].split(':')[1]))
 	dt = dt + timedelta(hours=hour)

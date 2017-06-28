@@ -22,7 +22,10 @@ document.getElementById("textSpan").textContent = tableNum;
 document.getElementById('tableIds').setAttribute("value",value2);
 document.getElementById("tableB"+tn).setAttribute("disabled", "disabled");
 document.getElementById("addButton").setAttribute("disabled", "disabled");
-
+var chairs = document.getElementById('chairs').value;
+var ch = parseInt(document.getElementById('textSpanCh').textContent);
+chairs = parseInt(chairs) + ch;
+document.getElementById('chairs').setAttribute('value',chairs);
 }
 </script>
 </head>
