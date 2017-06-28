@@ -95,10 +95,18 @@ class Offer(models.Model):  # done
     acepted = models.BooleanField()
 
 
+class OrderedFood(models.Model):
+    food = models.ForeignKey(Food)
+    amount = models.IntegerField()
+
+class OrderedDrink(models.Model):
+    beaverage = models.ForeignKey(Beaverage)
+    amount = models.IntegerField()
+
 class Order(models.Model):  # done
-    beaverages = models.ManyToManyField(Beaverage)
+    ordereddrinks = models.ManyToManyField(OrderedDrink)
     table = models.ForeignKey(RestaurantTable)
-    foods = models.ManyToManyField(Food)
+    orderedfoods = models.ManyToManyField(OrderedFood)
     employees = models.ManyToManyField(Employee)
     paid = models.BooleanField()
 

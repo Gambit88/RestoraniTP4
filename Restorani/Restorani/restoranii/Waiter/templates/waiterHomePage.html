@@ -23,8 +23,8 @@
         </tr>
         {%for i in order %} <tr>
             <td>{{i.table.tableNo}}</td>
-            <td>{%for j in i.foods.all%}{{j.name}}<br>{%endfor%}</td>
-            <td>{%for j in i.beaverages.all%}{{j.name}}<br>{%endfor%}</td>
+            <td>{%for j in i.orderedfoods.all%}{{j.food.name}} x{{j.amount}}<br>{%endfor%}</td>
+            <td>{%for j in i.ordereddrinks.all%}{{j.beaverage.name}} x{{j.amount}}<br>{%endfor%}</td>
             <td>{%if i.paid%} Yes {%else%} No{%endif%}</td>
         </tr>>{%endfor%}
     </table>
