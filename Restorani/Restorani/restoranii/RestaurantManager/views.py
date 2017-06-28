@@ -17,10 +17,17 @@ from restorani.models import Segment
 from restorani.models import RestaurantTable
 from restorani.models import Post
 from restorani.models import TableHelp
-from datetime import datetime
+from restorani.models import Schedule
+from restorani.models import Offer
+import datetime
+from django.core.mail import send_mail
 from django.template.defaulttags import register
 from django.contrib.auth.decorators import user_passes_test,login_required
 from django.views.decorators.csrf import csrf_exempt
+import smtplib
+import _thread
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 # Create your views here.
 
 #uslov za pristump stranici kao menadzer restorana
@@ -40,6 +47,7 @@ def restaurantManagerHome(request):
 def registarEmployee(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
 	restaurantID = Restaurant.objects.get(name = manager.restaurant.name)
+	print(restaurantID.name)
 	employees = Employee.objects.filter(restaurant = restaurantID.pk)
 	if request.method == 'POST':
 		if not request.POST.get('name'):
@@ -301,7 +309,7 @@ def managerOrder(request):
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error': error, 'link': link}))
 		try:
-			valid_datetime = datetime.strptime(request.POST.get('date'), '%Y-%m-%d %H:%M')
+			valid_datetime = request.POST.get('date').split('T')[0] + ' ' + request.POST.get('date').split('T')[1]
 		except:
 			error = "Invalid date"
 			link = "orderFromManager.html"
@@ -312,3 +320,110 @@ def managerOrder(request):
 		allPosts = Post.objects.all()
 		template = loader.get_template("orderFromManager.html")
 		return HttpResponse(template.render({'rest': restaurant, 'posts': allPosts}))
+
+@csrf_exempt
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def schedule(request):
+	manager = RestaurantManager.objects.get(email = request.user.username)
+	restaurant = Restaurant.objects.get(pk = manager.restaurant_id)
+	employees = Employee.objects.filter(restaurant = restaurant)
+	segment = Segment.objects.filter(restaurant = restaurant)
+	shift = Schedule.objects.all()
+	x = []
+	for i in shift:
+		if i.employee.restaurant == restaurant:
+			x.append(i)
+	datesList = []
+	today = datetime.date.today()
+	datesList.append(today)
+	for i in range(6):
+		datesList.append(today + datetime.timedelta(days=1))
+		today = today + datetime.timedelta(days=1)
+	if request.method == "POST":
+		employee = Employee.objects.get(pk = request.POST.get('r'))
+		type = employee.user.first_name
+		date1 = request.POST.get('date').split('T')[0]
+		section = None
+		if type == "WAITER":
+			section = Segment.objects.get(pk = request.POST.get('section'), restaurant=restaurant)
+			schedule = Schedule.objects.create(segment=section, employee=employee, shift=request.POST.get('shift'),
+											   date=date1)
+		else:
+			schedule = Schedule.objects.create(segment = section, employee = employee, shift = request.POST.get('shift'), date = date1)
+	template = loader.get_template("schedule.html")
+	return HttpResponse(template.render({'employees': employees, 'segment': segment, 'dates': datesList, 'rest': restaurant, 'x': shift, 'list': x}))
+
+@csrf_exempt
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def viewOffers(request):
+	manager = RestaurantManager.objects.get(email=request.user.username)
+	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
+	offers = Offer.objects.all()
+	offerList = []
+	for o in offers:
+		if o.post.restaurant == restaurant:
+			offerList.append(o)
+	temp = []
+	for i in offerList:
+		if i.acepted == True:
+			temp.append(i)
+	if temp:
+		for i in temp:
+			for j in offerList:
+				if i.post == j.post:
+					offerList.remove(j)
+	if request.method == "GET":
+		try:
+			template = loader.get_template("viewOffers.html")
+			return HttpResponse(template.render({'offers': offerList}))
+		except:
+			error = "No offers"
+			link = "viewOffers.html"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+	if request.method == "POST":
+		offer = Offer.objects.get(pk = request.POST.get('hidden'))
+		offer.acepted = True
+		offer.save()
+		offers = Offer.objects.all()
+		offerList = []
+		temp = []
+		tem2 = []
+		for o in offers:
+			if o.post.restaurant == restaurant:
+				offerList.append(o)
+		for i in offerList:
+			if i.acepted == True:
+				temp.append(i)
+				tem2.append(i)
+		if temp:
+			for i in temp:
+				for j in offerList:
+					if i.post == j.post:
+						offerList.remove(j)
+						tem2.append(j)
+		for i in tem2:
+			_thread.start_new_thread(sendEmail, (i.supplier.email,offer))
+		template = loader.get_template("viewOffers.html")
+		return HttpResponse(template.render({'offers': offerList}))
+
+
+def sendEmail(email, offer):
+	fromaddr = "tp4restoranii@gmail.com"
+	toaddr = email
+	msg = MIMEMultipart()
+	msg['From'] = fromaddr
+	msg['To'] = toaddr
+	msg['Subject'] = "Answer to your offer"
+	if email == offer.supplier.email:
+		body = "<html><head></head><body>'It is our pleasure to let you know that your offer is accepted</body></html>"
+	else:
+		body = "<html><head></head><body>'We are sorry to tell you that your offer wasn't accepted</body></html>"
+	msg.attach(MIMEText(body, 'html'))
+
+	server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.starttls()
+	server.login(fromaddr, "restorani")
+	text = msg.as_string()
+	server.sendmail(fromaddr, toaddr, text)
+	server.quit()

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="supplierHomePage"> Back </a> <br> <br>
+    Name: {{sup.name}} <br>
+    LastName: {{sup.surname}}
+    <br><br>
+
+
+    <form action="updateInfo" method="post">
+        <table>
+            <tr>
+                <td>Change Name:</td>
+                <td><input type="text" name="name"></td>
+            </tr>
+            <tr>
+                <td>Change Last Name:</td>
+                <td><input type="text" name="lastname"></td>
+            </tr>
+            <tr>
+                <td>Old Password</td>
+                <td><input type="password" name="opass"></td>
+            </tr>
+            <tr>
+                <td>Change Password</td>
+                <td><input type="password" name="pass"></td>
+            </tr>
+            <tr>
+                <td>Change Password</td>
+                <td><input type="password" name="rpass"></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Change"></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

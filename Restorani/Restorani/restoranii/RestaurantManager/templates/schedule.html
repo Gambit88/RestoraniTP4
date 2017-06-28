@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    td.size{
+        width: 300px;
+    }
+    table.cen{
+        text-align: center;
+    }
+</style>
+<body>
+    <form action="schedule" method="post">
+        <table class="cen">
+            <tr>
+                <td> Shift 1 </td>
+                {% for i in dates %}
+                    {% for j in list%}
+                        {% if i == j.date and j.shift == 1%}
+                            <td class="size">{{j.date}} | {{j.employee.name}} {{j.employee.surname}}</td>
+                        {%endif%}
+
+                    {%endfor%}
+                {%endfor%}
+            </tr>
+            <tr>
+                <td> Shift 2 </td>
+                {% for i in dates %}
+                    {% for j in list%}
+                        {% if i == j.date and j.shift == 2%}
+                            <td class="size">{{j.date}} | {{j.employee.name}} {{j.employee.surname}}</td>
+                        {%endif%}
+                    {%endfor%}
+                {%endfor%}
+            </tr>
+            <tr>
+                <td> Shift 3 </td>
+                {% for i in dates %}
+                    {% for j in list%}
+                        {% if i == j.date and j.shift == 3%}
+                            <td class="size">{{j.date}} | {{j.employee.name}} {{j.employee.surname}}</td>
+                        {%endif%}
+                    {%endfor%}
+                {%endfor%}
+            </tr>
+
+        </table>
+        <br><br>
+        <table>
+            <tr>
+                <td> Employee: </td>
+                <td> <select name="r"> {%for l in employees %} <option value={{l.pk}}> {{l.name}} {{l.surname}} </option> {%endfor%} </select> </td>
+            </tr>
+            <tr>
+                <td> Shift: </td>
+                <td>
+                    <select name="shift">
+                        <option value="1"> 1 </option>
+                        <option value="2"> 2 </option>
+                        <option value="3"> 3 </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> Section: </td>
+                <td> <select name="section"> {%for l in segment %} <option value={{l.pk}}> {{l.name}} </option> {%endfor%} </select> only for waiter </td>
+            </tr>
+            <tr>
+                <td> Date: </td>
+                <td> <input type="date" name="date" > </td>
+            </tr>
+            <tr>
+                <td colspan="2"> <input type="submit" value="OK"> </td>
+            </tr>
+        </table>
+    </form>
+Shift 1: 08:00-16:00 <br>
+Shift 2: 16:00-24:00 <br>
+Shift 3: 24:00-08:00 <br>
+</body>
+</html>

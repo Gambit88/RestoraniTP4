@@ -11,4 +11,6 @@ urlpatterns = [
 	url(r'^segments', views.addSegment),
 	url(r'^tables', views.tableLayout),
 	url(r'^order', views.managerOrder),
+	url(r'^schedule', views.schedule),
+	url(r'^viewOffers', views.viewOffers),
 ]

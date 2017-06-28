@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    td.size{
+    width: 50px;
+    }
+</style>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+    <table border="1">
+        <tr>
+            <td> Content </td>
+            <td> Expiration Date </td>
+            <td> Price </td>
+            <td> Accepted </td>
+            <td class="size"></td>
+        </tr>
+        {% for l in offers%}
+            <tr>
+                <td>{{l.post.content}}</td>
+                <td>{{l.post.expiration_date}}</td>
+                <td>{{l.price}}</td>
+                {% if l.acepted == False%}
+                    <td> No </td>
+                    <form action="viewOffers" method="post">
+                        <td> <input type="submit" value="Accept"> <input type="hidden" value={{l.pk}} name="hidden"> </td>
+                    </form>
+                {%else%}
+                    <td> Yes </td>
+                {%endif%}
+            </tr>
+        {%endfor%}
+    </table>
+</body>
+</html>

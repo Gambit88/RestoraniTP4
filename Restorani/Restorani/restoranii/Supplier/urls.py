@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^allPosts', views.allPosts),
     url(r'^myOffers', views.myOffers),
     url(r'^updateOffer', views.updateOffer),
+    url(r'^updateInfo', views.updateInfo),
 ]
