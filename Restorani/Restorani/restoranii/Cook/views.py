@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from restorani.models import Employee
 from restorani.models import Cook
+from restorani.models import Order
 from django.template import loader
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -17,8 +18,14 @@ def cookCheck(employee):
 def cookPage(request):
 	if(request.user.last_name == "False"):
 		user = request.user.username
+		c = Cook.objects.get(email=user)
+		orders = Order.objects.all()
+		temp = []
+		for i in orders:
+			if c.restaurant == i.table.restaurant:
+				temp.append(i)
 		template = loader.get_template("cookHomePage.html")
-		return HttpResponse(template.render({'user': user}))
+		return HttpResponse(template.render({'user': user,'orders':temp}))
 	else:
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())

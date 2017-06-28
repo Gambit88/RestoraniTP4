@@ -20,9 +20,14 @@ def bartenderCheck(employee):
 def bartenderPage(request):
 	if(request.user.last_name == "False"):
 		user = request.user.username
-		
+		b = Bartender.objects.get(email = user)
+		orders = Order.objects.all()
+		temp = []
+		for i in orders:
+			if b.restaurant == i.table.restaurant:
+				temp.append(i)
 		template = loader.get_template("bartenderHomePage.html")
-		return HttpResponse(template.render({'user': user,'orders':orders}))
+		return HttpResponse(template.render({'user': user,'orders':temp}))
 	else:
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())

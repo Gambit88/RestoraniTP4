@@ -8,5 +8,15 @@
     <a href="./bartenderProfile">{{user}}</a>
     <p>Bartener</p>
     <p>Dodati listu pica koja treba da spremi ;)</p>
+    <table>
+        <tr>Drinks to prepper</tr>
+        <tr><td>Table Number</td><td>Drinks and amount</td></tr>
+        {%for i in orders%}
+        <tr>
+            <td align="center">{{i.table.tableNo}}</td>
+            <td>{%for j in i.ordereddrinks.all%}{{j.beaverage.name}} x{{j.amount}}<br>{%endfor%}</td>
+        </tr>
+        {%endfor%}
+    </table>
 </body>
 </html>
