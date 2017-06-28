@@ -7,4 +7,6 @@ urlpatterns = [
 	url(r'^waiterProfile', views.waiterProfile, name = "waiterProfile"),
 	url(r'^editWaiterProfile', views.editWaiterProfile, name = "editWaiterProfile"),
 	url(r'^editWaiterPassword', views.changeWaiterPassword, name = "editWaiterPassword"),
+	url(r'^addOrder', views.addOrder),
+	url(r'^saveOrder', views.saveOrder, name = "saveOrder"),
 ]

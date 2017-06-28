@@ -6,5 +6,5 @@ urlpatterns = [
 	url(r'^login',views.loginRequest),
 	url(r'^logout', views.logOut, name="logOut"),
 	url(r'^changePassword', views.firstLogin),
-	url(r'^add',views.sysAdmin),
+	url(r'^admin',views.sysAdmin),
 ]

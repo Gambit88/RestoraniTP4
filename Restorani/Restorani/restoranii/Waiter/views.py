@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.template import loader
 from restorani.models import Employee
 from restorani.models import Waiter
+from restorani.models import RestaurantTable
+from restorani.models import Food
+from restorani.models import Beaverage
+from restorani.models import Order
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test,login_required
@@ -18,8 +22,10 @@ def waiterCheck(employee):
 def waiterPage(request):
 	if(request.user.last_name == "False"):
 		user = request.user.username
+		waiter = Waiter.objects.get(email=request.user.username)
+		orders = Order.objects.filter(employees = waiter)
 		template = loader.get_template("waiterHomePage.html")
-		return HttpResponse(template.render({'user': user}))
+		return HttpResponse(template.render({'user': user, 'order': orders}))
 	else:
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())
@@ -68,3 +74,52 @@ def changeWaiterPassword(request):
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	return redirect('waiterProfile')
+@user_passes_test(waiterCheck,login_url='./')
+@csrf_exempt
+def addOrder(request):##### IZBRISATI TESTIRANJE
+	#waiter = request.user.employee
+	waiter = Waiter.objects.get(email=request.user.username)
+	restaurant = request.user.employee.restaurant
+	tables = RestaurantTable.objects.filter(restaurant=restaurant)
+	food = Food.objects.filter(restaurant = restaurant)
+	drinks = Beaverage.objects.filter(restaurant = restaurant)
+	template = loader.get_template("addOrderPage.html")
+	return HttpResponse(template.render({'tables': tables, 'food': food, 'drinks': drinks}))
+
+@user_passes_test(waiterCheck,login_url='./')
+@csrf_exempt
+def saveOrder(request):
+	tableNumber = request.POST.get('tableNo')
+	orderedFood = request.POST.get('foods')
+	orderedDrinks = request.POST.get('drinks')
+	print(tableNumber)
+	orderedFood = orderedFood.strip()
+	orderedDrinks = orderedDrinks.strip()
+	food = orderedFood.split(' ')
+	drinks = orderedDrinks.split(' ')
+	e = Waiter.objects.get(email=request.user.username)
+	em = []
+	em.append(e)
+	rest = e.restaurant
+	t = RestaurantTable.objects.get(tableNo = tableNumber, restaurant = rest)
+
+	foodList = []
+	for i in food:
+		f = Food.objects.get(id = i)
+		foodList.append(f)
+	drinkList = []
+	for j in drinks:
+		d = Beaverage.objects.get(id = j)
+		drinkList.append(d)
+	order = Order.objects.create(table=t, paid=False)
+	order.save()
+	order.beaverages = drinkList
+	order.foods = foodList
+	order.employees = em
+	order.save()
+	orders = Order.objects.filter(employees = e)
+	template = loader.get_template("waiterHomePage.html")
+	user = request.user.username
+	return HttpResponse(template.render({'user':user,'order':orders}))
+
+

@@ -8,5 +8,25 @@
     <a href="./waiterProfile">{{user}}</a>
     <p>Waiter</p>
     <p>...Hrana i pice spremno ...</p>
+    <form action = "./addOrder">
+        <input type="submit" value="Add Order">
+    </form>
+    <table border = 1>
+        <tr>
+            <td colspan="4" align="center">Orders</td>
+        </tr>
+        <tr>
+            <td>Table Number</td>
+            <td>Food</td>
+            <td>Beverages</td>
+            <td>Paid</td>
+        </tr>
+        {%for i in order %} <tr>
+            <td>{{i.table.tableNo}}</td>
+            <td>{%for j in i.foods.all%}{{j.name}}<br>{%endfor%}</td>
+            <td>{%for j in i.beaverages.all%}{{j.name}}<br>{%endfor%}</td>
+            <td>{%if i.paid%} Yes {%else%} No{%endif%}</td>
+        </tr>>{%endfor%}
+    </table>
 </body>
 </html>
