@@ -456,19 +456,84 @@ def res_part4(request):
 		for fid in flist:
 			friend = Guest.objects.get(id=fid)
 			invList.guests.add(friend)
+	for guest in invList.guests.all():
+		_thread.start_new_thread(sendEmailRes, (guest.email,reservation.id,restaurant.name))
 	return redirect('guestHomePage')
 	
-	
-	
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')	
+def res_page(request):
+	if request.method=='GET':
+		id = request.GET.get('id')
+		reservation = Reservation.objects.get(pk=id)
+		try:
+			guest = reservation.invitelist.guests.get(id = request.user.guest.id)
+		except:
+			error = 'You are not invited to join this reservation.'
+			link = "./guestHomePage"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		tnum = ""
+		for table in reservation.restaurantTables.all():
+			tnum = tnum + " " + str(table.tableNo)
+		date = str(reservation.date)
+		duration = str(reservation.duration)
+		rname = reservation.restaurant.name
+		template = loader.get_template("reservationchoice.html")
+		return HttpResponse(template.render({'name':rname,'dandt':date,'duration':duration,'tableNums':tnum,'id':reservation.id}))
 	
 
 @csrf_exempt
 @login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def res_confirm(request):
-	pass
+	if request.method=='POST':
+		id = request.POST.get('id')
+		reservation = Reservation.objects.get(pk=id)
+		try:
+			guest = reservation.invitelist.guests.get(id = request.user.guest.id)
+		except:
+			error = 'You are not invited to join this reservation.'
+			link = "./guestHomePage"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		guest.reservations.add(reservation)
+		reservation.invitelist.guests.remove(guest)
+		return redirect('guestHomePage')
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def res_deny(request):
+	if request.method=='POST':
+		id = request.POST.get('id')
+		reservation = Reservation.objects.get(pk=id)
+		try:
+			guest = reservation.invitelist.guests.get(id = request.user.guest.id)
+		except:
+			error = 'You are not invited to join this reservation.'
+			link = "./guestHomePage"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		reservation.invitelist.guests.remove(guest)
+		return redirect('guestHomePage')
 
-
+def sendEmailRes(email,id,rName):
+	fromaddr = "tp4restoranii@gmail.com"
+	toaddr = email
+	msg = MIMEMultipart()
+	msg['From'] = fromaddr
+	msg['To'] = toaddr
+	msg['Subject'] = "Invite for reservation to "+rName
+	
+	body = "<html><head></head><body>You have been invited to join restaurant reservation, to confirm or declain please open this <a href= http:/localhost:8000/restoranii/confirmReservation?id="+str(id)+">link</a> in a new page. You need to be signed in to access this page.</body></html>"
+	msg.attach(MIMEText(body, 'html'))
+	
+	server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.starttls()
+	server.login(fromaddr, "restorani")
+	text = msg.as_string()
+	server.sendmail(fromaddr, toaddr, text)
+	server.quit()
 
 def add_time(date,hour):
 	dt = datetime(day = int(date.split(' ')[0].split('-')[2]),month = int(date.split(' ')[0].split('-')[1]), year = int(date.split(' ')[0].split('-')[0]), hour = int(date.split(' ')[1].split(':')[0]), minute = int(date.split(' ')[1].split(':')[1]))

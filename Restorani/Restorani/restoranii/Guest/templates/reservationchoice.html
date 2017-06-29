@@ -1,0 +1,30 @@
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+Reservation for restaurant: {{name}}
+<br/>
+<br/>
+Date: {{dandt}}
+<br/>
+<br/>
+Duration: {{duration}} hours
+<br/>
+<br/>
+Tables: {{tableNums}}
+<br/>
+<br/>
+<form method="post" action="./declainReservation">
+<input type="hidden" value={{id}} name="id"/>
+<input type="submit" value="Deny"/>
+</form>
+<form method="post" action="./aceptReservation">
+<input type="hidden" value={{id}} name="id"/>
+<input type="submit" value="Confirm"/>
+</form>
+
+<br/>
+<br/>
+</body>
+</html>

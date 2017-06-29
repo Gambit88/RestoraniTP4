@@ -13,4 +13,7 @@ urlpatterns = [
 	url(r'^tablePick',views.res_part2),
 	url(r'^friendPick', views.res_part3),
 	url(r'^fullReserve', views.res_part4),
+	url(r'^confirmReservation', views.res_page),
+	url(r'^aceptReservation', views.res_confirm),
+	url(r'^declainReservation', views.res_deny),
 ]
