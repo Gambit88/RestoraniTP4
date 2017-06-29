@@ -15,10 +15,12 @@
         <tr align="center">Food to prepper</tr>
         <tr><td>Table Number</td><td align="center">Food</td></tr>
         {%for i in orders%}
-        <tr>
-            <td align="center">{{i.table.tableNo}}</td>
-            <td align="center">{%for j in i.orderedfoods.all%}{{j.food.name}} x{{j.amount}}<br>{%endfor%}</td>
-        </tr>
+            {%if not j.paid%}
+                <tr>
+                    <td align="center">{{i.table.tableNo}}</td>
+                    <td align="center">{%for j in i.orderedfoods.all%}{{j.food.name}} x{{j.amount}}<br>{%endfor%}</td>
+                </tr>
+            {%endif%}
         {%endfor%}
     </table>
 </body>

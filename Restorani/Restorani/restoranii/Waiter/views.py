@@ -8,6 +8,8 @@ from restorani.models import Beaverage
 from restorani.models import Order
 from restorani.models import OrderedFood
 from restorani.models import OrderedDrink
+from restorani.models import TableHelp
+from restorani.models import Schedule
 import json
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -28,9 +30,37 @@ def waiterPage(request):
     if (request.user.last_name == "False"):
         user = request.user.username
         waiter = Waiter.objects.get(email=request.user.username)
-        orders = Order.objects.filter(employees=waiter)
+        restaurant = waiter.restaurant
+        orders = Order.objects.all()
+        temp = []
+        for i in orders:
+            if restaurant == i.table.restaurant:
+                temp.append(i)
+        tables = RestaurantTable.objects.filter(restaurant=restaurant)
+        tlist = []
+        for i in range(restaurant.sizeX):
+            for j in range(restaurant.sizeY):
+                test = True
+                # za stolove koji postoje
+                if tables is not None:
+                    for table in tables:
+                        if i == table.posX and j == table.posY:
+                            tableH = TableHelp()
+                            tableH.num = table.tableNo
+                            tableH.segment = table.segment.name
+                            tlist.append(tableH)
+                            test = False
+                if test:
+                    tableH = TableHelp()
+                    tableH.num = ""
+                    tableH.segment = ""
+                    tlist.append(tableH)
         template = loader.get_template("waiterHomePage.html")
-        return HttpResponse(template.render({'user': user, 'order': orders}))
+        schedule = Schedule.objects.get(employee = waiter)
+        segment = schedule.segment
+        listI = list(range(0, restaurant.sizeX))
+        listJ = list(range(0,restaurant.sizeY))
+        return HttpResponse(template.render({'user': user, 'order': orders, 'tables':tlist, 'segment': segment,'listI':listI,'listJ':listJ}))
     else:
         template = loader.get_template("static/firstLoginPasswordChange.html")
         return HttpResponse(template.render())
@@ -146,10 +176,7 @@ def saveOrder(request):
     order.orderedfoods = foodList
     order.employees = em
     order.save()
-    orders = Order.objects.filter(employees=e)
-    template = loader.get_template("waiterHomePage.html")
-    user = request.user.username
-    return HttpResponse(template.render({'user': user, 'order': orders}))
+    return redirect("waiterHomePage")
 
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
@@ -159,7 +186,6 @@ def editOrder(request):
 	waiter = Waiter.objects.get(email=request.user.username)
 	restaurant = request.user.employee.restaurant
 	tables = RestaurantTable.objects.filter(restaurant=restaurant)
-
 	template = loader.get_template("editOrder.html")
 	return HttpResponse(template.render({'order': order}))
 
@@ -182,15 +208,14 @@ def createBill(request):
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def payOrder(request):
-	orderID = request.POST.get('orderID')
-	order = Order.objects.get(id=orderID)
-	order.paid = True
-	order.save()
-	user = request.user.username
-	waiter = Waiter.objects.get(email=request.user.username)
-	orders = Order.objects.filter(employees=waiter)
-	template = loader.get_template("waiterHomePage.html")
-	return HttpResponse(template.render({'order':orders, 'user': user}))
+    orderID = request.POST.get('orderID')
+    order = Order.objects.get(id=orderID)
+    order.paid = True
+    order.save()
+    user = request.user.username
+    waiter = Waiter.objects.get(email=request.user.username)
+    orders = Order.objects.filter(employees=waiter)
+    return redirect("waiterHomePage")
 
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt

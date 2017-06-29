@@ -21,10 +21,11 @@ def bartenderPage(request):
 	if(request.user.last_name == "False"):
 		user = request.user.username
 		b = Bartender.objects.get(email = user)
+		restaurant = b.restaurant
 		orders = Order.objects.all()
 		temp = []
 		for i in orders:
-			if b.restaurant == i.table.restaurant:
+			if restaurant == i.table.restaurant:
 				temp.append(i)
 		template = loader.get_template("bartenderHomePage.html")
 		return HttpResponse(template.render({'user': user,'orders':temp}))
