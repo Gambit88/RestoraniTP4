@@ -230,10 +230,8 @@ def saveFoods(request):
     for i in foodListTmp:
         foodList.append(i)
     for i in foodList:
-        if i in foodDict:
-            foodDict[i.food] += 1
-        else:
-            foodDict[i.food] = 1
+        if i.food not in foodDict:
+            foodDict[i.food] = i.amount
     for i in food:
         f = Food.objects.get(id=i)
         if f in foodDict:
@@ -271,10 +269,8 @@ def saveDrinks(request):
     for i in drinkListTmp:
         drinkList.append(i)
     for i in drinkList:
-        if i in drinkDict:
-            drinkDict[i.beaverage] += 1
-        else:
-            drinkDict[i.beaverage] = 1
+        if i.beaverage not in drinkDict:
+            drinkDict[i.beaverage] = i.amount
     for j in drinks:
         b = Beaverage.objects.get(id=j)
         if b in drinkDict:
@@ -309,6 +305,11 @@ def removeFood(request):
     for i in foodTemp:
         if i.food != f:
             food.append(i)
+        else:
+            if i.amount > 1:
+                i.amount -= 1
+                i.save()
+                food.append(i)
     order.orderedfoods = list()
     order.orderedfoods = food
     order.save()
@@ -327,6 +328,11 @@ def removeDrink(request):
     for i in drinkTemp:
         if i.beaverage != b:
             drink.append(i)
+        else:
+            if i.amount > 1:
+                i.amount -= 1
+                i.save()
+                drink.append(i)
     order.ordereddrinks = list()
     order.ordereddrinks= drink
     order.save()
