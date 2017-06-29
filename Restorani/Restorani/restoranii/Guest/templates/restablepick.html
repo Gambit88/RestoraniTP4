@@ -15,7 +15,7 @@ var value2 = document.getElementById('tableIds').value;
 value2= value2 +' '+ value;
 
 var tableNum = document.getElementById('textSpanNm').textContent;
-var tn = tableNum
+var tn = tableNum;
 var tableNumAll = document.getElementById('textSpan').textContent;
 tableNum = tableNumAll+' '+tableNum;
 document.getElementById("textSpan").textContent = tableNum;
@@ -43,7 +43,7 @@ Pick tables:
 <br/>
 {% for i in listI%}
 <br/><br/>
-{% for j in listJ%}{% for table in tables%}{% if i == table.posX and j == table.posY%}<button id="tableB{{table.num}}"{%if table.status == False%}disabled="True"{%endif%} onclick=tButtonClick({{table.chairs}},'{{table.segment}}',{{table.num}},{{table.id}})>{%if table.num == ""%}&nbsp;&nbsp;{%else%}{{table.num}}{%endif%}</button>&nbsp;{%endif%}{%endfor%}{%endfor%}{%endfor%}
+{% for j in listJ%}{% for table in tables%}{% if i == table.posX and j == table.posY%}<button id="tableB{{table.num}}"{%if table.status == False%}disabled="True"{%endif%} onclick="tButtonClick({{table.chairs}},'{{table.segment}}',{{table.num}},{{table.id}})">{%if table.num == ""%}&nbsp;&nbsp;{%else%}{{table.num}}{%endif%}</button>&nbsp;{%endif%}{%endfor%}{%endfor%}{%endfor%}
 <br/>
 <br/>
 Table number: <span id="textSpanNm"></span> &nbsp; Table chairs: <span id="textSpanCh"></span> &nbsp; Segment: <span id="textSpanSg"></span>
