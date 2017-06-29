@@ -173,3 +173,8 @@ class TableHelp():
     chairs = 0
     id = None
     segment = ""
+
+class Notification(models.Model):
+    order = models.ForeignKey(Order)
+    message = models.CharField(max_length=50)
+    type = models.CharField(max_length=10, null = True)

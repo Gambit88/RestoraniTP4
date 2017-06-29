@@ -10,6 +10,7 @@ from restorani.models import OrderedFood
 from restorani.models import OrderedDrink
 from restorani.models import TableHelp
 from restorani.models import Schedule
+from restorani.models import Notification
 import json
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -36,6 +37,9 @@ def waiterPage(request):
         for i in orders:
             if restaurant == i.table.restaurant:
                 temp.append(i)
+       # notifications = []
+        foodNotifications = Notification.objects.filter(type = "food")
+        drinkNotifications = Notification.objects.filter(type = "drink")
         tables = RestaurantTable.objects.filter(restaurant=restaurant)
         tlist = []
         for i in range(restaurant.sizeX):
@@ -60,7 +64,8 @@ def waiterPage(request):
         segment = schedule.segment
         listI = list(range(0, restaurant.sizeX))
         listJ = list(range(0,restaurant.sizeY))
-        return HttpResponse(template.render({'user': user, 'order': orders, 'tables':tlist, 'segment': segment,'listI':listI,'listJ':listJ}))
+
+        return HttpResponse(template.render({'user': user, 'order': temp, 'tables':tlist, 'segment': segment,'listI':listI,'listJ':listJ,'foodNotifications':foodNotifications,'drinkNotifications':drinkNotifications}))
     else:
         template = loader.get_template("static/firstLoginPasswordChange.html")
         return HttpResponse(template.render())

@@ -7,4 +7,5 @@ urlpatterns = [
 	url(r'^bartenderProfile', views.bartenderProfile, name = "bartenderProfile"),
 	url(r'^editBartenderProfile', views.editBartenderProfile, name = "editBartenderProfile"),
 	url(r'^editBartenderPassword', views.changeBartenderPassword, name = "editBartenderPassword"),
+	url(r'^DrinkReady', views.DrinkReady, name = "DrinkReady"),
 ]

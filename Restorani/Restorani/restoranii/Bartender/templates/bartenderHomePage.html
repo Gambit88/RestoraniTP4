@@ -19,6 +19,8 @@
                 <tr>
                     <td align="center">{{i.table.tableNo}}</td>
                     <td>{%for j in i.ordereddrinks.all%}{{j.beaverage.name}} x{{j.amount}}<br>{%endfor%}</td>
+                    <td><form method="post" action="./DrinkReady"><input name="orderID" type="hidden" value = {{i.id}}>
+                        <input type = submit value = "DrinkReady"></form></td>
                 </tr>
             {%endif%}
         {%endfor%}

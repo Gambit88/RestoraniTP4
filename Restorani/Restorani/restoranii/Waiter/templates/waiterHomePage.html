@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Home Page</title>
+    <script>
+        window.setTimeout(function () {
+            location.href = "http://localhost:8000/restoranii/waiterHomePage";
+        }, 5000);
+    </script>
 </head>
 <body>
     <form action="logout">
@@ -17,13 +22,14 @@
     </form>
     <table border = 1>
         <tr>
-            <td colspan="5" align="center">Orders</td>
+            <td colspan="7" align="center">Orders</td>
         </tr>
         <tr>
             <td>Table Number</td>
             <td>Food</td>
             <td>Beverages</td>
             <td colspan="2" align="center">Options</td>
+            <td colspan="2">Notifications</td>
         </tr>
         {%for i in order %}
             {%if not i.paid%}
@@ -40,6 +46,11 @@
                         <td><input type="hidden" name = "orderID" value = {{i.id}}>
                             <input type="submit" value = "Create Bill"></td>
                     </form>
+
+                    <td>{%for j in foodNotifications%}{%if j.order == i%}{{j.message}}{%endif%}{%endfor%}</td>
+
+                    <td>{%for j in drinkNotifications%}{%if j.order == i%}{{j.message}}{%endif%}{%endfor%}</td>
+
                 </tr>
             {%endif%}
         {%endfor%}

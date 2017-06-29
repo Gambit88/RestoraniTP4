@@ -2,6 +2,7 @@ from django.shortcuts import render
 from restorani.models import Employee
 from restorani.models import Bartender
 from restorani.models import Order
+from restorani.models import Notification
 from django.template import loader
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -78,3 +79,14 @@ def changeBartenderPassword(request):
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	return redirect('bartenderProfile')
+
+@user_passes_test(bartenderCheck,login_url='./')
+@csrf_exempt
+def DrinkReady(request):
+	orderID = request.POST.get('orderID')
+	order = Order.objects.get(id = orderID)
+	message = "Drinks Ready"
+	type = "drink"
+	n = Notification.objects.create(message = message,order = order, type = type)
+	n.save()
+	return redirect("bartenderHomePage")

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from restorani.models import Employee
 from restorani.models import Cook
 from restorani.models import Order
+from restorani.models import Notification
 from django.template import loader
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -75,3 +76,25 @@ def changeCookPassword(request):
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	return redirect('cookProfile')
+
+@user_passes_test(cookCheck,login_url='./')
+@csrf_exempt
+def PreparingFood(request):
+	orderID = request.POST.get('orderID')
+	order = Order.objects.get(id = orderID)
+	message = "Food is Preparing"
+	type = "food"
+	n = Notification.objects.create(message = message, order = order, type = type)
+	n.save()
+	return redirect("cookHomePage")
+
+@user_passes_test(cookCheck,login_url='./')
+@csrf_exempt
+def Ready(request):
+	orderID = request.POST.get('orderID')
+	order = Order.objects.get(id = orderID)
+	message = "Food is Ready"
+	n = Notification.objects.get(type = "food")
+	n.message = message
+	n.save()
+	return redirect("cookHomePage")

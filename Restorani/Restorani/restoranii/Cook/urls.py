@@ -7,4 +7,6 @@ urlpatterns = [
 	url(r'^cookProfile', views.cookProfile, name = "cookProfile"),
 	url(r'^editCookProfile', views.editCookProfile, name = "editCookProfile"),
 	url(r'^editCookPassword', views.changeCookPassword, name = "editCookPassword"),
+	url(r'^PreparingFood', views.PreparingFood, name = "PreparingFood"),
+	url(r'^Ready', views.Ready, name = "Ready"),
 ]

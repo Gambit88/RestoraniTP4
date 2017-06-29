@@ -8,9 +8,10 @@
     <form action="logout">
        <input type="submit" value="Logout"/>
     </form>
+    <br>
     <a href="./cookProfile">{{user}}</a>
-    <p>Cook</p>
-    <p>Dodati listu jela koja treba da spremi :)</p>
+    <br>
+    <br>
     <table border="1">
         <tr align="center">Food to prepper</tr>
         <tr><td>Table Number</td><td align="center">Food</td></tr>
@@ -19,6 +20,10 @@
                 <tr>
                     <td align="center">{{i.table.tableNo}}</td>
                     <td align="center">{%for j in i.orderedfoods.all%}{{j.food.name}} x{{j.amount}}<br>{%endfor%}</td>
+                    <td><form method="post" action="./PreparingFood"><input name="orderID" type="hidden" value = {{i.id}}>
+                        <input type = submit value = "Accept"></form></td>
+                    <td><form method="post" action="./Ready"><input name="orderID" type="hidden" value = {{i.id}}>
+                        <input type = submit value = "Ready"></form></td>
                 </tr>
             {%endif%}
         {%endfor%}
