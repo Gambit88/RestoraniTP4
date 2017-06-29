@@ -27,7 +27,7 @@
                 {% if l.acepted == False%}
                     <td> No </td>
                     <form action="viewOffers" method="post">
-                        <td> <input type="submit" value="Accept"> <input type="hidden" value={{l.pk}} name="hidden"> </td>
+                        <td><input type="hidden" value="{{offers.pk}}" name=""> <input type="submit" value="Accept"> <input type="hidden" value={{l.pk}} name="hidden"> </td>
                     </form>
                 {%else%}
                     <td> Yes </td>

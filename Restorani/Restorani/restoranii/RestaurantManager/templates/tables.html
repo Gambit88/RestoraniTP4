@@ -25,13 +25,36 @@ input.size{
     {%endfor%}
     <br> <br>
     <form action="tables" method="post">
-        TableNo: <input type="number" name="table"/> <br><br>
+        <input type="hidden" value="add" name="type">
+        TableNo: <input type="number" name="table" required/> <br><br>
         Segment: <select name="r"> {%for l in segments %} <option>  {{l.name}} </option> {%endfor%} </select> <br><br>
-        ChairNo: <input type="number" name="chair"/> <br><br>
-        PositionX: <input type="number" name="x"/> <br><br>
-        PostitionY: <input type="number" name="y"/> <br><br>
+        ChairNo: <input type="number" name="chair" required/> <br><br>
+        PositionX: <input type="number" name="x" required/> <br><br>
+        PostitionY: <input type="number" name="y" required/> <br><br>
         <input type="submit" value="Add">
     </form>
-
+    <br>
+    <form action="tables" method="post">
+        <input type="hidden" value="remove" name="type">
+        TableNo: <input type="number" name="delete" required>
+        <input type="submit" value="Delete">
+    </form>
+    <br><br>
+    <form action="tables" method="post">
+        <input type="hidden" value="change" name="type">
+        TableNo: <input type="number" name="tno" required/>
+        <input type="submit" value="Get">
+    </form>
+    <br>
+    <form action="tables" method="post">
+        <input type="hidden" value={{id.pk}} name="id">
+        <input type="hidden" value="final" name="type">
+        Segment: {{id.segment.name}} <br>
+        Chair Number: {{id.chairNo}} <br> <br>
+        Segment: <select name="newseg"> {%for l in segments %} <option>  {{l.name}} </option> {%endfor%} </select> <br><br>
+        ChairNo: <input type="number" name="newchair" required/> <br><br>
+        <input type="submit" value="Change">
+    </form>
+    <br>
 </body>
 </html>

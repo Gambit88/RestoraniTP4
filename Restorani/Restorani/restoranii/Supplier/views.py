@@ -16,6 +16,7 @@ def supplierCheck(supplier):
 	return supplier.first_name=="SUPPLIER"
 
 #home stranica za menagera sistema
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(supplierCheck,login_url='./')
 def supplierHome(request):
 	template = loader.get_template("supplierHomePage.html")
@@ -24,6 +25,7 @@ def supplierHome(request):
 
 #prikaz svih ponuda i dodavanje ponude ponudjaca
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(supplierCheck,login_url='./')
 def allPosts(request):
     if request.method == "GET":
@@ -70,6 +72,7 @@ def allPosts(request):
         return HttpResponse(template.render({'posts': posts}))
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(supplierCheck,login_url='./')
 def myOffers(request):
     try:
@@ -108,6 +111,7 @@ def myOffers(request):
 
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(supplierCheck,login_url='./')
 def updateOffer(request):
     if request.method == "GET":
@@ -122,6 +126,7 @@ def updateOffer(request):
         return HttpResponse(template.render({'offer': offer}))
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(supplierCheck,login_url='./')
 def updateInfo(request):
     user = request.user.username

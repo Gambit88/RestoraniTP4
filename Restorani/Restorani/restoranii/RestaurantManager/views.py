@@ -19,6 +19,7 @@ from restorani.models import Post
 from restorani.models import TableHelp
 from restorani.models import Schedule
 from restorani.models import Offer
+from restorani.models import Reservation
 import datetime
 from django.core.mail import send_mail
 from django.template.defaulttags import register
@@ -35,6 +36,7 @@ def restaurantManagerCheck(restaurantManager):
 	return restaurantManager.first_name=="MANAGER"
 
 #home stranica za menagera sistema
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def restaurantManagerHome(request):
 	template = loader.get_template("RMHomePage.html")
@@ -43,6 +45,7 @@ def restaurantManagerHome(request):
 
 #registracija zaposlenih
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def registarEmployee(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -100,6 +103,7 @@ def registarEmployee(request):
 
 #dodavanje pica za odredjeni restoran
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def drinks(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -128,6 +132,7 @@ def drinks(request):
 
 #dodavanje jela za odredjeni restoran
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def food(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -156,6 +161,7 @@ def food(request):
 
 #registracija ponudjaca
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def supplier(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -185,6 +191,7 @@ def supplier(request):
 
 #izmena restorana
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def updateRest(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -206,6 +213,7 @@ def updateRest(request):
 	return HttpResponse(template.render({'rest': restaurant}))
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def addSegment(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -231,8 +239,10 @@ def addSegment(request):
 
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def tableLayout(request):
+	id = None
 	manager = RestaurantManager.objects.get(email = request.user.username)
 	restaurant = Restaurant.objects.get(pk = manager.restaurant_id)
 	allSegments = Segment.objects.filter(restaurant=restaurant.pk)
@@ -276,15 +286,96 @@ def tableLayout(request):
 			template = loader.get_template("tables.html")
 			return HttpResponse(template.render({'rest': restaurant}))
 	if request.method == "POST":
-		segment = Segment.objects.get(name = request.POST.get('r'), restaurant = restaurant)
-		table = RestaurantTable.objects.create(tableNo = request.POST.get('table'), segment = segment, chairNo = request.POST.get('chair'),
+		if request.POST.get('type') == "add":
+			segment = Segment.objects.get(name = request.POST.get('r'), restaurant = restaurant)
+			table = RestaurantTable.objects.create(tableNo = request.POST.get('table'), segment = segment, chairNo = request.POST.get('chair'),
 											   posX = request.POST.get('x'), posY = request.POST.get('y'), restaurant = restaurant)
+
+		if request.POST.get('type') == "remove":
+			try:
+				x = RestaurantTable.objects.get(tableNo = request.POST.get('delete'), restaurant = restaurant)
+				try:
+					res = Reservation.objects.get(restaurantTables = x)
+					error = "Cant't change this table it's reserved"
+					link = "tables.html"
+					template = loader.get_template("error.html")
+					return HttpResponse(template.render({'error': error, 'link': link}))
+				except:
+					y = RestaurantTable.objects.get(pk = x.pk).delete()
+			except:
+				error = "Table doesn't exist"
+				link = "tables.html"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error': error, 'link': link}))
+
+		if request.POST.get('type') == "change":
+			if not request.POST.get('tno'):
+				error = "Table doesn't exist"
+				link = "tables.html"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error': error, 'link': link}))
+			try:
+				id = RestaurantTable.objects.get(tableNo = request.POST.get('tno'), restaurant = restaurant)
+				try:
+					res = Reservation.objects.get(restaurantTables = id)
+					print(res)
+					print("---------------------------------")
+					error = "Cant't change this table it's reserved"
+					link = "tables.html"
+					template = loader.get_template("error.html")
+					return HttpResponse(template.render({'error': error, 'link': link}))
+				except:
+					pass
+			except:
+				error = "Table doesn't exist"
+				link = "tables.html"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error': error, 'link': link}))
+
+		if request.POST.get('type') == "final":
+			change = RestaurantTable.objects.get(pk = request.POST.get('id'))
+			change.segment = Segment.objects.get(name = request.POST.get('newseg'), restaurant = restaurant)
+			change.chairNo = request.POST.get('newchair')
+			change.save()
+
+		tables = RestaurantTable.objects.filter(restaurant=restaurant)
+		tableX = []
+		tableY = []
+		for t in tables:
+			tableX.append(t.posX)
+			tableY.append(t.posY)
+		tlist = []
+		for i in range(restaurant.sizeX):
+			for j in range(restaurant.sizeY):
+				test = True
+				for table in tables:
+					if i == table.posX and j == table.posY:
+						# ubaci proveru da li je rezervisan za kasnije, pa ako jeste nemoj da dozvolis da se menja/brise? promenis True na False za status?
+						tableH = TableHelp()
+						tableH.posX = i
+						tableH.posY = j
+						tableH.status = True
+						tableH.num = table.tableNo
+						tableH.segment = table.segment.name
+						tableH.id = table.id
+						tlist.append(tableH)
+						test = False
+				if test:
+					tableH = TableHelp()
+					tableH.posX = i
+					tableH.posY = j
+					tableH.status = False
+					tableH.num = ""
+					tableH.segment = ""
+					tableH.id = -1
+					tlist.append(tableH)
 		template = loader.get_template("tables.html")
 		return HttpResponse(template.render(
 			{'rest': restaurant, 'segments': allSegments, 'rangeX': range(restaurant.sizeX),
-			 'rangeY': range(restaurant.sizeY), 'tlist': tlist}))
+			 'rangeY': range(restaurant.sizeY), 'tlist': tlist, 'id': id}))
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def managerOrder(request):
 	manager = RestaurantManager.objects.get(email=request.user.username)
@@ -322,6 +413,7 @@ def managerOrder(request):
 		return HttpResponse(template.render({'rest': restaurant, 'posts': allPosts}))
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def schedule(request):
 	manager = RestaurantManager.objects.get(email = request.user.username)
@@ -354,6 +446,7 @@ def schedule(request):
 	return HttpResponse(template.render({'employees': employees, 'segment': segment, 'dates': datesList, 'rest': restaurant, 'x': shift, 'list': x}))
 
 @csrf_exempt
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(restaurantManagerCheck,login_url='./')
 def viewOffers(request):
 	manager = RestaurantManager.objects.get(email=request.user.username)
@@ -372,13 +465,17 @@ def viewOffers(request):
 			for j in offerList:
 				if i.post == j.post:
 					offerList.remove(j)
+	for i in offerList:
+		if i.acepted == True:
+			offerList.remove(i)
+
 	if request.method == "GET":
 		try:
 			template = loader.get_template("viewOffers.html")
 			return HttpResponse(template.render({'offers': offerList}))
 		except:
 			error = "No offers"
-			link = "viewOffers.html"
+			link = "rmHomePage.html"
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error': error, 'link': link}))
 	if request.method == "POST":
@@ -402,6 +499,9 @@ def viewOffers(request):
 					if i.post == j.post:
 						offerList.remove(j)
 						tem2.append(j)
+		for i in offerList:
+			if i.acepted == True:
+				offerList.remove(i)
 		for i in tem2:
 			_thread.start_new_thread(sendEmail, (i.supplier.email,offer))
 		template = loader.get_template("viewOffers.html")
@@ -427,3 +527,4 @@ def sendEmail(email, offer):
 	text = msg.as_string()
 	server.sendmail(fromaddr, toaddr, text)
 	server.quit()
+
