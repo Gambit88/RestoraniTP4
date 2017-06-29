@@ -58,6 +58,7 @@ class Reservation(models.Model):  # done
     date = models.DateTimeField()
     duration = models.IntegerField()
     complete = models.BooleanField()
+    rated = models.BooleanField(default=False)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, null=True)
 
 class Guest(models.Model):  # done
@@ -111,6 +112,7 @@ class Order(models.Model):  # done
     orderedfoods = models.ManyToManyField(OrderedFood)
     employees = models.ManyToManyField(Employee)
     paid = models.BooleanField()
+    time = models.CharField(max_length=100, default="Now")
 
 
 class RatingFood(models.Model):  # done

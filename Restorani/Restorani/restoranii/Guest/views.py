@@ -4,7 +4,7 @@ from django.template import loader
 from restorani.models import Guest
 from restorani.models import Reservation
 from restorani.models import Restaurant
-from restorani.models import RestaurantTable
+from restorani.models import RestaurantTable, Food, Beaverage, Waiter, Order, OrderedFood, OrderedDrink
 from django.contrib.auth.models import User
 import smtplib
 import _thread
@@ -23,6 +23,7 @@ from validate_email import validate_email
 from restorani.models import TableHelp
 from datetime import datetime, timedelta
 from django.db import connection
+from django.utils import timezone
 
 # Create your views here.
 #registracija
@@ -374,6 +375,11 @@ def res_part2(request):
 @user_passes_test(guestCheck,login_url='./')
 def res_part3(request):
 	tids = request.POST.get('tableIds')
+	if tids=="":
+		err = "No tables selected."
+		link = "./guestHomePage"
+		template = loader.get_template("error.html")
+		return HttpResponse(template.render({'error':err , 'link':link}))
 	dandt = request.POST.get('dandt')
 	duration = request.POST.get('duration')
 	restaurant = Restaurant.objects.get(id = request.POST.get('identity'))
@@ -517,6 +523,85 @@ def res_deny(request):
 		reservation.invitelist.guests.remove(guest)
 		return redirect('guestHomePage')
 
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def order_food(request):
+	if request.method=='GET':
+		id = request.GET.get('id')
+		res = Reservation.objects.get(id = int(id))
+		food = Food.objects.filter(restaurant=res.restaurant)
+		drinks = Beaverage.objects.filter(restaurant=res.restaurant)
+		template = loader.get_template("orderFoodGuest.html")
+		return HttpResponse(template.render({'res': res, 'food': food, 'drinks': drinks, 'tables':res.restaurantTables.all()}))
+	if request.method=='POST':
+		if reservation.date<timezone.now():
+			error = 'You cannot use online order anymore.'
+			link = "./guestHomePage"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': error, 'link': link}))
+		id = request.POST.get('id')
+		reservation = Reservation.objects.get(id = int(id))
+		tableNumber = request.POST.get('tableNo')
+		orderedFood = request.POST.get('foods')
+		orderedDrinks = request.POST.get('drinks')
+		orderedFood = orderedFood.strip()
+		orderedDrinks = orderedDrinks.strip()
+		food = orderedFood.split(' ')
+		drinks = orderedDrinks.split(' ')
+		e = Waiter.objects.filter(restaurant = reservation.restaurant)[0]
+		em = []
+		em.append(e)
+		rest = e.restaurant
+		t = RestaurantTable.objects.get(tableNo=tableNumber, restaurant=rest)
+		order = Order.objects.create(table=t, paid=False)
+		order.save()
+		foodList = []
+		foodDict = {}
+		for i in food:
+			f = Food.objects.get(id=i)
+			foodDict[f] = 0
+		for i in food:
+			f = Food.objects.get(id=i)
+			foodDict[f] += 1
+		for key in foodDict:
+			of = OrderedFood.objects.create(food=key, amount=foodDict[key])
+			of.save()
+			foodList.append(of)
+		drinkList = []
+		drinkDict = {}
+		for i in drinks:
+			d = Beaverage.objects.get(id=i)
+			drinkDict[d] = 0
+		for j in drinks:
+			d = Beaverage.objects.get(id=j)
+			drinkDict[d] += 1
+		for key in drinkDict:
+			od = OrderedDrink.objects.create(beaverage=key, amount=drinkDict[key])
+			od.save()
+			drinkList.append(od)
+		order.ordereddrinks = drinkList
+		order.orderedfoods = foodList
+		order.employees = em
+		order.time = str(reservation.date)
+		order.save()
+		template = loader.get_template("static/finishedOrder.html")
+		return HttpResponse(template.render())
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')
+def rate(request):
+	pass
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(guestCheck,login_url='./')	
+def cancel_res(request):
+	if request.method=='POST':
+		id = request.POST.get('id')
+		reservation = Reservation.objects.get(id = int(id))
+		request.user.guest.reservations.remove(reservation)
+		return redirect("guestHomePage")
+	
 def sendEmailRes(email,id,rName):
 	fromaddr = "tp4restoranii@gmail.com"
 	toaddr = email

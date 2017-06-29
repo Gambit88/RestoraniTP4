@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+function addFood(){
+    var e = document.getElementById('food');
+    var value = e.options[e.selectedIndex].value;
+    var value2 = document.getElementById('foods').value;
+    value2= value2 +' '+ value;
+    document.getElementById('foods').setAttribute("value",value2);
+    var table = document.getElementById('foodTable');
+    var row = table.insertRow(0);
+    var cell1 = row.insertCell(0);
+    cell1.innerHTML = e.options[e.selectedIndex].text;
+}
+function addDrink(){
+    var e = document.getElementById('drink');
+    var value = e.options[e.selectedIndex].value;
+    var value2 = document.getElementById('drinks').value;
+    value2= value2 +' '+ value;
+    document.getElementById('drinks').setAttribute("value",value2);
+
+    var table = document.getElementById('drinkTable');
+    var row = table.insertRow(0);
+    var cell1 = row.insertCell(0);
+    cell1.innerHTML = e.options[e.selectedIndex].text;
+}
+</script>
+</head>
+<body>
+	<a href="./">Povratak</a>
+	<br/>
+	<br/>
+    <table>
+        <tr>
+            <td>Food</td>
+            <td> <select id="food"> {%for i in food %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
+            <td><button onclick="addFood()" id="addButton1">Add Food</button></td>
+        </tr>
+        <tr><table id = foodTable></table></tr>
+        <tr>
+            <td>Beverages</td>
+            <td> <select id="drink"> {%for i in drinks %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
+            <td><button onclick="addDrink()" id="addButton2">Add Beverage</button></td>
+        </tr>
+        <tr><table id = drinkTable></table></tr>
+    </table>
+    <form method="post" action="./orderFoodGuest">
+        <table>
+            <tr>
+                <td>Table Number</td>
+                <td> <select name="tableNo"> {%for i in tables %} <option> {{i.tableNo}} </option> {%endfor%} </select>
+            </td>
+        </tr>
+        </table>
+        <input type = hidden id = "foods" name = "foods">
+        <input type = hidden id = "drinks" name = "drinks">
+        <input type = hidden id = "id" name = "id" value="{{res.id}}">
+		<br/>
+        <input type="submit" value="Order"/>
+    </form>
+</body>
+</html>

@@ -92,6 +92,14 @@ def firstLogin(request):
 		link = "./changePassword"
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
+@csrf_exempt
+def recheck(request):
+	reservations = Reservation.objects.all()
+	for reservation in reservations:
+		if timezone.now()>reservation.date:
+			reservation.complete = True
+			reservation.save()
+	return redirect("IndexPage")
 @csrf_exempt	
 def sysAdmin(request):
 	user = User.objects.create_user(username = 'admin@admin.com', password = 'admin')

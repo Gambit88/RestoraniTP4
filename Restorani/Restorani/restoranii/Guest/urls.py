@@ -16,4 +16,7 @@ urlpatterns = [
 	url(r'^confirmReservation', views.res_page),
 	url(r'^aceptReservation', views.res_confirm),
 	url(r'^declainReservation', views.res_deny),
+	url(r'^rateRestaurant', views.rate),
+	url(r'^orderFoodGuest', views.order_food),
+	url(r'^cancelReservation', views.cancel_res),
 ]

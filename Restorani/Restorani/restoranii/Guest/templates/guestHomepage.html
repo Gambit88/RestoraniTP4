@@ -11,13 +11,13 @@ Restaurant visits:
 <table>
 <thead>
 	<tr>
-		<th>Restaurant</th><th>Date</th><th>Duration</th>
+		<th>Restaurant</th><th>Date</th><th>Duration</th><th>Rate</th><th>Order</th><th>Cancel reservation</th>
 	</tr>
 </thead>
 <tbody>
 	{%for visit in visits%}
 		<tr>
-		<td>{{visit.restaurant.name}} </td><td>{{visit.date}} </td><td>{{visit.duration}} </td>
+		<td>{{visit.restaurant.name}} </td><td>{{visit.date}} </td><td>{{visit.duration}} </td><td>{%if visit.complete == True and visit.rated == False%}<form method="get" action="./rateRestaurant"><input type="hidden" name ="id" value="{{visit.id}}"/><input type="submit" value="Rate"/></form>{%else%}&nbsp;{%endif%}</td><td>{%if visit.complete == False%}<form method="get" action="./orderFoodGuest"><input type="hidden" name ="id" value="{{visit.id}}"/><input type="submit" value="Order"/></form>{%else%}&nbsp;{%endif%}</td><td><form method="post" action="./cancelReservation"><input type="hidden" name ="id" value="{{visit.id}}"/><input type="submit" value="Cancel reservation"/></form></td>
 		</tr>
 	{%endfor%}
 	<td>&nbsp </td><td>&nbsp </td><td>&nbsp </td>
