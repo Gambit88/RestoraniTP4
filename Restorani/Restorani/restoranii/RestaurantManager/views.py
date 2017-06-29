@@ -54,32 +54,6 @@ def registarEmployee(request):
 	print(restaurantID.name)
 	employees = Employee.objects.filter(restaurant = restaurantID.pk)
 	if request.method == 'POST':
-		if not request.POST.get('name'):
-			error = 'Name has not been submited'
-			link = "./employeeReg"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('lastname'):
-			error = 'Last Name has not been submited'
-			link = "./employeeReg"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('email'):
-			error = 'Email has not been submited'
-			link = "./employeeReg"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('shoe'):
-			error = 'Shoe size has not been submited'
-			link = "./employeeReg"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if request.POST.get('job') == "Cook":
-			if not request.POST.get('type'):
-				error = 'Type of cook has not been submited'
-				link = "./employeeReg"
-				template = loader.get_template("error.html")
-				return HttpResponse(template.render({'error': error, 'link': link}))
 		if request.POST.get('job') == "Waiter":
 			user = User.objects.create_user(username = request.POST.get('email'), first_name = "WAITER", password = "waiter", last_name = True)
 			waiter = Waiter.objects.create(name=request.POST.get('name'),
@@ -111,22 +85,6 @@ def drinks(request):
 	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
 	getDrinks = Beaverage.objects.filter(restaurant = restaurant.pk)
 	if request.method == "POST":
-		if not request.POST.get('name'):
-			error = 'Name has not been submited'
-			link = "beverages.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('description'):
-			error = 'Description has not been submited'
-			link = "beverages.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('price'):
-			error = 'Price has not been submited'
-			link = "beverages.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-
 		beverage = Beaverage.objects.create(name = request.POST.get('name'), description = request.POST.get('description'), price = request.POST.get('price'), restaurant = restaurant)
 	template = loader.get_template("beverages.html")
 	return HttpResponse(template.render({'rest': restaurant,'drinks': getDrinks}))
@@ -140,22 +98,6 @@ def food(request):
 	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
 	getfood = Food.objects.filter(restaurant = restaurant.pk)
 	if request.method == "POST":
-		if not request.POST.get('name'):
-			error = 'Name has not been submited'
-			link = "meal.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('description'):
-			error = 'Description has not been submited'
-			link = "meal.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('price'):
-			error = 'Price has not been submited'
-			link = "meal.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-
 		food = Food.objects.create(name = request.POST.get('name'), description = request.POST.get('description'), price = request.POST.get('price'), restaurant = restaurant)
 	template = loader.get_template("meal.html")
 	return HttpResponse(template.render({'rest': restaurant,'food': getfood}))
@@ -169,21 +111,6 @@ def supplier(request):
 	restaurant = Restaurant.objects.get(pk = manager.restaurant_id)
 	getSuppliers = Supplier.objects.all()
 	if request.method == "POST":
-		if not request.POST.get('name'):
-			error = 'Name has not been submited'
-			link = "supplier.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('lastname'):
-			error = 'Last Name has not been submited'
-			link = "supplier.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
-		if not request.POST.get('email'):
-			error = 'Email has not been submited'
-			link = "supplier.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
 		user = User.objects.create_user(username = request.POST.get('email'), first_name = "SUPPLIER",
 										password = "supplier", last_name = True)
 		supplier = Supplier.objects.create(name = request.POST.get('name'), surname = request.POST.get('lastname'), email = request.POST.get('email'), user = user)
@@ -228,11 +155,6 @@ def addSegment(request):
 			template = loader.get_template("segments.html")
 			return HttpResponse(template.render({'rest': restaurant}))
 	if request.method == "POST":
-		if not request.POST.get('name'):
-			error = "You didn't input segment"
-			link = "segments.html"
-			template = loader.get_template("error.html")
-			return HttpResponse(template.render({'error': error, 'link': link}))
 		segment = Segment.objects.create(name=request.POST.get('name'), restaurant=restaurant)
 		allSegments = Segment.objects.filter(restaurant = restaurant.pk)
 		template = loader.get_template("segments.html")
@@ -570,4 +492,3 @@ def sendEmail(email, offer):
 	text = msg.as_string()
 	server.sendmail(fromaddr, toaddr, text)
 	server.quit()
-
