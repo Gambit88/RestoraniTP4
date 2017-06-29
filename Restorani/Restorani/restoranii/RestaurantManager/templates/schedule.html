@@ -14,40 +14,6 @@
 </style>
 <body>
     <form action="schedule" method="post">
-        <table class="cen">
-            <tr>
-                <td> Shift 1 </td>
-                {% for i in dates %}
-                    {% for j in list%}
-                        {% if i == j.date and j.shift == 1%}
-                            <td class="size">{{j.date}} | {{j.employee.name}} {{j.employee.surname}}</td>
-                        {%endif%}
-
-                    {%endfor%}
-                {%endfor%}
-            </tr>
-            <tr>
-                <td> Shift 2 </td>
-                {% for i in dates %}
-                    {% for j in list%}
-                        {% if i == j.date and j.shift == 2%}
-                            <td class="size">{{j.date}} | {{j.employee.name}} {{j.employee.surname}}</td>
-                        {%endif%}
-                    {%endfor%}
-                {%endfor%}
-            </tr>
-            <tr>
-                <td> Shift 3 </td>
-                {% for i in dates %}
-                    {% for j in list%}
-                        {% if i == j.date and j.shift == 3%}
-                            <td class="size">{{j.date}} | {{j.employee.name}} {{j.employee.surname}}</td>
-                        {%endif%}
-                    {%endfor%}
-                {%endfor%}
-            </tr>
-
-        </table>
         <br><br>
         <table>
             <tr>

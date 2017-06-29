@@ -29,6 +29,7 @@ import smtplib
 import _thread
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from django.db import connection
 # Create your views here.
 
 #uslov za pristump stranici kao menadzer restorana
@@ -421,16 +422,6 @@ def schedule(request):
 	employees = Employee.objects.filter(restaurant = restaurant)
 	segment = Segment.objects.filter(restaurant = restaurant)
 	shift = Schedule.objects.all()
-	x = []
-	for i in shift:
-		if i.employee.restaurant == restaurant:
-			x.append(i)
-	datesList = []
-	today = datetime.date.today()
-	datesList.append(today)
-	for i in range(6):
-		datesList.append(today + datetime.timedelta(days=1))
-		today = today + datetime.timedelta(days=1)
 	if request.method == "POST":
 		employee = Employee.objects.get(pk = request.POST.get('r'))
 		type = employee.user.first_name
@@ -443,7 +434,7 @@ def schedule(request):
 		else:
 			schedule = Schedule.objects.create(segment = section, employee = employee, shift = request.POST.get('shift'), date = date1)
 	template = loader.get_template("schedule.html")
-	return HttpResponse(template.render({'employees': employees, 'segment': segment, 'dates': datesList, 'rest': restaurant, 'x': shift, 'list': x}))
+	return HttpResponse(template.render({'employees': employees, 'segment': segment, 'rest': restaurant, 'x': shift,}))
 
 @csrf_exempt
 @login_required(redirect_field_name='IndexPage')
@@ -451,26 +442,25 @@ def schedule(request):
 def viewOffers(request):
 	manager = RestaurantManager.objects.get(email=request.user.username)
 	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
-	offers = Offer.objects.all()
-	offerList = []
-	for o in offers:
-		if o.post.restaurant == restaurant:
-			offerList.append(o)
-	temp = []
-	for i in offerList:
-		if i.acepted == True:
-			temp.append(i)
-	if temp:
-		for i in temp:
-			for j in offerList:
-				if i.post == j.post:
-					offerList.remove(j)
-	for i in offerList:
-		if i.acepted == True:
-			offerList.remove(i)
-
 	if request.method == "GET":
 		try:
+			offers = Offer.objects.all()
+			offerList = []
+			for o in offers:
+				if o.post.restaurant == restaurant:
+					offerList.append(o)
+			temp = []
+			for i in offerList:
+				if i.acepted == True:
+					temp.append(i)
+			if temp:
+				for i in temp:
+					for j in offerList:
+						if i.post == j.post:
+							offerList.remove(j)
+			for i in offerList:
+				if i.acepted == True:
+					offerList.remove(i)
 			template = loader.get_template("viewOffers.html")
 			return HttpResponse(template.render({'offers': offerList}))
 		except:
@@ -479,6 +469,59 @@ def viewOffers(request):
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error': error, 'link': link}))
 	if request.method == "POST":
+		lista = request.POST.get('lista')
+		list = lista[:-1]
+
+		cursor = connection.cursor()
+		cursor.execute("LOCK TABLES restorani_offer WRITE, restorani_post WRITE, restorani_restaurant WRITE, restorani_supplier WRITE")
+		offers = Offer.objects.all()
+		offerList = []
+		temp = []
+		tem2 = []
+		for o in offers:
+			if o.post.restaurant == restaurant:
+				offerList.append(o)
+		for i in offerList:
+			if i.acepted == True:
+				temp.append(i)
+				tem2.append(i)
+		if temp:
+			for i in temp:
+				for j in offerList:
+					if i.post == j.post:
+						offerList.remove(j)
+						tem2.append(j)
+		for i in offerList:
+			if i.acepted == True:
+				offerList.remove(i)
+
+		x = 0
+		for i in list.split(" "):
+			x += 1
+		if len(offerList) != x:
+			cursor.execute("UNLOCK TABLES;")
+			err = "New offer has arrived-------duzine nisu jednae!!!"
+			link = "viewOffers.html"
+			template = loader.get_template("error.html")
+			return HttpResponse(template.render({'error': err, 'link': link}))
+		else:
+			part = list.split(" ")
+			for i in part:
+				parts = i.split(",")
+				id = int(parts[0])
+				price = parts[1]
+				for j in offerList:
+					if id == j.pk:
+						if price != j.price:
+							cursor.execute("UNLOCK TABLES;")
+							err = "New offer has arrived--razlicite cene!!!"
+							link = "viewOffers.html"
+							template = loader.get_template("error.html")
+							return HttpResponse(template.render({'error': err, 'link': link}))
+						else:
+							print("jednaki")
+
+		offer = Offer.objects.get(pk = request.POST.get('hidden'))
 		offer = Offer.objects.get(pk = request.POST.get('hidden'))
 		offer.acepted = True
 		offer.save()
