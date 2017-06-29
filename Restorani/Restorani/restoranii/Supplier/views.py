@@ -30,6 +30,9 @@ def allPosts(request):
         try:
             allOffers = Offer.objects.all()
             posts = Post.objects.all()
+            list = []
+            for i in posts:
+                list.append(i)
             tempRemove = []
             for i in allOffers:
                 if i.acepted:
@@ -38,11 +41,11 @@ def allPosts(request):
                 if i.expiration_date <= timezone.now():
                     tempRemove.append(i)
             for i in tempRemove:
-                posts.remove(i)
-
-
+                for j in list:
+                    if i == j:
+                        list.remove(i)
             template = loader.get_template("allPosts.html")
-            return HttpResponse(template.render({'posts': posts}))
+            return HttpResponse(template.render({'posts': list}))
         except:
             error = 'No current offers from managers'
             link = "supplierHomePage.html"
@@ -87,12 +90,14 @@ def myOffers(request):
         for i in myTemp:
             for j in tempAccepted:
                 if i.post == j.post:
-                    tempRemove.append(j)
+                    tempRemove.append(i)
             if i.post.expiration_date < timezone.now():
                 tempRemove.append(i)
         # brisanje svih offera iz Myoffera ciji su postovi jednaki sa accepted postovima
         for i in tempRemove:
             myTemp.remove(i)
+
+
         template = loader.get_template("myOffers.html")
         return HttpResponse(template.render({'offers': myTemp}))
     except:
