@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+function addDrink(){
+    var e = document.getElementById('drink');
+    var value = e.options[e.selectedIndex].value;
+    var value2 = document.getElementById('drinks').value;
+    value2= value2 +' '+ value;
+    document.getElementById('drinks').setAttribute("value",value2);
+
+    var table = document.getElementById('drinkTable');
+    var row = table.insertRow(0);
+    var cell1 = row.insertCell(0);
+    cell1.innerHTML = e.options[e.selectedIndex].text;
+}
+</script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>Beverages</td>
+            <td> <select id="drink"> {%for i in drinks %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
+            <td><button onclick="addDrink()" id="addButton2">Add Beverage</button></td>
+        </tr>
+    </table>
+    <table id = drinkTable></table>
+    <form method="post" action="./saveDrinks">
+        <input type="hidden" value="{{order.id}}" name = "orderID">
+        <input type = hidden id = "drinks" name = "drinks">
+        <input type="submit" value="Done">
+    </form>
+</body>
+</html>

@@ -12,4 +12,10 @@ urlpatterns = [
 	url(r'^editOrder', views.editOrder, name = "editOrder"),
 	url(r'^createBill', views.createBill, name="createBill"),
 	url(r'^payOrder', views.payOrder, name="payOrder"),
+	url(r'^addFood', views.addFood, name = "addFood"),
+	url(r'^addDrink', views.addDrink, name = "addDrink"),
+	url(r'^saveFoods', views.saveFoods, name = "saveFoods"),
+	url(r'^saveDrinks', views.saveDrinks, name = "saveDrinks"),
+	url(r'^removeFood', views.removeFood, name = "removeFood"),
+	url(r'^removeDrink', views.removeDrink, name = "removeDrink"),
 ]

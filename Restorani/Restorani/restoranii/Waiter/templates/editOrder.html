@@ -2,57 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script type="text/javascript">
-function addFood(){
-    var e = document.getElementById('food');
-    var value = e.options[e.selectedIndex].value;
-    var value2 = document.getElementById('foods').value;
-    value2= value2 +' '+ value;
-    document.getElementById('foods').setAttribute("value",value2);
-    var table = document.getElementById('foodTable');
-    var row = table.insertRow(0);
-    var cell1 = row.insertCell(0);
-    cell1.innerHTML = e.options[e.selectedIndex].text;
-}
-function addDrink(){
-    var e = document.getElementById('drink');
-    var value = e.options[e.selectedIndex].value;
-    var value2 = document.getElementById('drinks').value;
-    value2= value2 +' '+ value;
-    document.getElementById('drinks').setAttribute("value",value2);
-    var table = document.getElementById('drinkTable');
-    var row = table.insertRow(0);
-    var cell1 = row.insertCell(0);
-    cell1.innerHTML = e.options[e.selectedIndex].text;
-}
 
-</script>
 </head>
 <body>
-    <form>
-        <table>
-        <tr>
-            <td>Food</td>
-            <td> <select id="food"> {%for i in food %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
-            <td><button onclick="addFood()" id="addButton1">Add Food</button></td>
-        </tr>
-        <tr></tr>
-        <tr>
-            <td>Beverages</td>
-            <td> <select id="drink"> {%for i in drinks %} <option value = "{{i.id}}"> {{i.name}} </option> {%endfor%} </select> </td>
-            <td><button onclick="addDrink()" id="addButton2">Add Beverage</button></td>
-        </tr>
+    <table>
+        <tr><td><form method="post" action="./addFood"><input name="orderID" type="hidden" value = "{{order.id}}"><input type = submit value = "Add Food"></form></td></tr>
+        {%for i in order.orderedfoods.all%}
+            <tr>
+                <td>{{i.food.name}} x{{i.amount}}</td>
+                <td><form method="post" action="./removeFood">
+                    <input name="orderID" type="hidden" value="{{order.id}}">
+                    <input name="foodID" type="hidden" value="{{i.food.id}}">
+                    <input type = submit value = Remove></form></td>
+            </tr>
+        {%endfor%}
     </table>
-    <table>{%for i in order.orderedfoods.all%}<tr><td>{{i.food.name}} x{{i.amount}}</td></tr>{%endfor%}</table>
-    <table id =  foodTable></table>
-    <table>{%for i in order.ordereddrinks.all%}<tr><td>{{i.beaverage.name}} x{{i.amount}}</td></tr>{%endfor%}</table>
-    <table id = drinkTable></table>
-    <form method="post" action="./saveOrder">
-        <button id="editButton">Submit</button>
-        <input type = hidden id = "foods" name = "foods">
-        <input type = hidden id = "drinks" name = "drinks">
-        <input type = hidden name = orderID value = {{order.id}}>
-    </form>
-    </form>
+    <table>
+        <tr><td><form method="post" action="./addDrink"><input  name="orderID"type="hidden" value = "{{order.id}}"><input type = submit value = "Add Drink"></form></td></tr>
+        {%for i in order.ordereddrinks.all%}
+            <tr>
+                <td>{{i.beaverage.name}} x{{i.amount}}</td>
+                <td><form method="post" action="./removeDrink">
+                    <input  name="orderID" type="hidden" value="{{order.id}}">
+                    <input  name="drinkID" type="hidden" value="{{i.beaverage.id}}">
+                    <input type = submit value = Remove></form></td>
+            </tr>
+        {%endfor%}
+    </table>
+    <a href="./waiterHomePage">Done</a>
 </body>
 </html>

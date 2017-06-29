@@ -103,11 +103,14 @@ def saveOrder(request):
     tableNumber = request.POST.get('tableNo')
     orderedFood = request.POST.get('foods')
     orderedDrinks = request.POST.get('drinks')
-    print(tableNumber)
     orderedFood = orderedFood.strip()
     orderedDrinks = orderedDrinks.strip()
-    food = orderedFood.split(' ')
-    drinks = orderedDrinks.split(' ')
+    food = []
+    if orderedFood != '':
+        food = orderedFood.split(' ')
+    drinks = []
+    if orderedDrinks != '':
+        drinks = orderedDrinks.split(' ')
     e = Waiter.objects.get(email=request.user.username)
     em = []
     em.append(e)
@@ -156,11 +159,9 @@ def editOrder(request):
 	waiter = Waiter.objects.get(email=request.user.username)
 	restaurant = request.user.employee.restaurant
 	tables = RestaurantTable.objects.filter(restaurant=restaurant)
-	food = Food.objects.filter(restaurant=restaurant)
-	drinks = Beaverage.objects.filter(restaurant=restaurant)
 
 	template = loader.get_template("editOrder.html")
-	return HttpResponse(template.render({'order': order,'food': food, 'drinks': drinks}))
+	return HttpResponse(template.render({'order': order}))
 
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
@@ -190,3 +191,144 @@ def payOrder(request):
 	orders = Order.objects.filter(employees=waiter)
 	template = loader.get_template("waiterHomePage.html")
 	return HttpResponse(template.render({'order':orders, 'user': user}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def addFood(request):
+    order_id = request.POST.get('orderID')
+    order = Order.objects.get(id = order_id)
+    rest = ""
+    for i in order.employees.all():
+        rest = i.restaurant
+    food = Food.objects.filter(restaurant=rest)
+    template = loader.get_template("addFood.html")
+    return HttpResponse(template.render({'order':order, 'food': food}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def addDrink(request):
+    order_id = request.POST.get('orderID')
+    order = Order.objects.get(id = order_id)
+    rest = ""
+    for i in order.employees.all():
+        rest = i.restaurant
+    drinks = Beaverage.objects.filter(restaurant=rest)
+    template = loader.get_template("addDrink.html")
+    return HttpResponse(template.render({'order': order, 'drinks': drinks}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def saveFoods(request):
+    orderedFood = request.POST.get('foods')
+    orderedFood = orderedFood.strip()
+    order_id = request.POST.get('orderID')
+    order = Order.objects.get(id=order_id)
+    food = orderedFood.split(' ')
+    foodListTmp = order.orderedfoods.all()
+    foodDict = {}
+    foodList = []
+    for i in foodListTmp:
+        foodList.append(i)
+    for i in foodList:
+        if i in foodDict:
+            foodDict[i.food] += 1
+        else:
+            foodDict[i.food] = 1
+    for i in food:
+        f = Food.objects.get(id=i)
+        if f in foodDict:
+            foodDict[f] += 1
+        else:
+            foodDict[f] = 1
+    for key in foodDict:
+        f = True
+        for i in foodList:
+            if key == i.food:
+                f = False
+                i.amount = foodDict[key]
+                i.save()
+        if f:
+            of = OrderedFood.objects.create(food=key, amount=foodDict[key])
+            of.save()
+            foodList.append(of)
+    order.orderedfoods = list()
+    order.orderedfoods = foodList
+    order.save()
+    template = loader.get_template("editOrder.html")
+    return HttpResponse(template.render({'order': order}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def saveDrinks(request):
+    orderedDrinks = request.POST.get('drinks')
+    orderedDrinks = orderedDrinks.strip()
+    order_id = request.POST.get('orderID')
+    order = Order.objects.get(id=order_id)
+    drinks = orderedDrinks.split(' ')
+    drinkListTmp = order.ordereddrinks.all()
+    drinkDict = {}
+    drinkList = []
+    for i in drinkListTmp:
+        drinkList.append(i)
+    for i in drinkList:
+        if i in drinkDict:
+            drinkDict[i.beaverage] += 1
+        else:
+            drinkDict[i.beaverage] = 1
+    for j in drinks:
+        b = Beaverage.objects.get(id=j)
+        if b in drinkDict:
+            drinkDict[b] += 1
+        else:
+            drinkDict[b] = 1
+    for key in drinkDict:
+        f = True
+        for i in drinkList:
+            if key == i.beaverage:
+                f = False
+                i.amount = drinkDict[key]
+                i.save()
+        if f:
+            od = OrderedDrink.objects.create(beaverage=key, amount=drinkDict[key])
+            od.save()
+            drinkList.append(od)
+    order.ordereddrinks = list()
+    order.ordereddrinks = drinkList
+    order.save()
+    template = loader.get_template("editOrder.html")
+    return HttpResponse(template.render({'order': order}))
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def removeFood(request):
+    orderID = request.POST.get('orderID')
+    foodID = request.POST.get('foodID')
+    f = Food.objects.get(id = foodID)
+    order = Order.objects.get(id = orderID)
+    foodTemp = order.orderedfoods.all()
+    food = []
+    for i in foodTemp:
+        if i.food != f:
+            food.append(i)
+    order.orderedfoods = list()
+    order.orderedfoods = food
+    order.save()
+    template = loader.get_template("editOrder.html")
+    return HttpResponse(template.render({'order': order}))
+
+@user_passes_test(waiterCheck, login_url='./')
+@csrf_exempt
+def removeDrink(request):
+    orderID = request.POST.get('orderID')
+    drinkID = request.POST.get('drinkID')
+    order = Order.objects.get(id=orderID)
+    b = Beaverage.objects.get(id=drinkID)
+    drinkTemp = order.ordereddrinks.all()
+    drink = []
+    for i in drinkTemp:
+        if i.beaverage != b:
+            drink.append(i)
+    order.ordereddrinks = list()
+    order.ordereddrinks= drink
+    order.save()
+    template = loader.get_template("editOrder.html")
+    return HttpResponse(template.render({'order': order}))
