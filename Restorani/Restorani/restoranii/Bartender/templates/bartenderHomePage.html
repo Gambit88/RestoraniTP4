@@ -21,7 +21,7 @@
     <br>
     <table border="1">
         <tr>Drinks to prepper</tr>
-        <tr><td>Table Number</td><td>Drinks and amount</td></tr>
+        <tr><td>Table Number</td><td>Drinks and amount</td><td>Options</td></tr>
         {%for i in orders%}
             {%if not i.paid%}
                 <tr>
@@ -29,6 +29,7 @@
                     <td>{%for j in i.ordereddrinks.all%}{{j.beaverage.name}} x{{j.amount}}<br>{%endfor%}</td>
                     <td><form method="post" action="./DrinkReady"><input name="orderID" type="hidden" value = {{i.id}}>
                         <input type = submit value = "DrinkReady"></form></td>
+                    {%if i.time != "Now"%}<td>{{i.time}}</td>{%endif%}
                 </tr>
             {%endif%}
         {%endfor%}

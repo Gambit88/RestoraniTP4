@@ -54,11 +54,10 @@
                         <td><input type="hidden" name = "orderID" value = {{i.id}}>
                             <input type="submit" value = "Create Bill"></td>
                     </form>
-
                     <td>{%for j in foodNotifications%}{%if j.order == i%}{{j.message}}{%endif%}{%endfor%}</td>
 
                     <td>{%for j in drinkNotifications%}{%if j.order == i%}{{j.message}}{%endif%}{%endfor%}</td>
-
+                    {%if i.time != "Now"%}<td>{{i.time}}</td>{%endif%}
                 </tr>
             {%endif%}
         {%endfor%}

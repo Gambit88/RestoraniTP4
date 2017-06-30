@@ -17,6 +17,7 @@ from django.contrib.auth import login
 # Create your views here.
 def cookCheck(employee):
 	return employee.first_name=="COOK"
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(cookCheck,login_url='./')
 def cookPage(request):
 	if(request.user.last_name == "False"):
@@ -67,14 +68,14 @@ def cookPage(request):
 	else:
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(cookCheck,login_url='./')
 def cookProfile(request):
 	cook = Cook.objects.get(email=request.user.username)
 	link = "./cookHomePage"
 	template = loader.get_template("cookProfile.html")
 	return HttpResponse(template.render({'cook':cook, 'back': link}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(cookCheck,login_url='./')
 @csrf_exempt
 def editCookProfile(request):
@@ -88,7 +89,7 @@ def editCookProfile(request):
 		cook.shoeSize = request.POST.get('shoeSize')
 	cook.save()
 	return redirect('cookProfile')
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(cookCheck,login_url='./')
 @csrf_exempt
 def changeCookPassword(request):
@@ -113,7 +114,7 @@ def changeCookPassword(request):
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	return redirect('cookProfile')
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(cookCheck,login_url='./')
 @csrf_exempt
 def PreparingFood(request):
@@ -124,7 +125,7 @@ def PreparingFood(request):
 	n = Notification.objects.create(message = message, order = order, type = type)
 	n.save()
 	return redirect("cookHomePage")
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(cookCheck,login_url='./')
 @csrf_exempt
 def Ready(request):

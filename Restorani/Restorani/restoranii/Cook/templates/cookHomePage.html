@@ -22,7 +22,7 @@
     <br>
     <table border="1">
         <tr align="center">Food to prepper</tr>
-        <tr><td>Table Number</td><td align="center">Food</td></tr>
+        <tr><td>Table Number</td><td align="center">Food</td><td colspan="2" align="center">Options</td></tr>
         {%for i in orders%}
             {%if not j.paid%}
                 <tr>
@@ -32,6 +32,7 @@
                         <input type = submit value = "Accept"></form></td>
                     <td><form method="post" action="./Ready"><input name="orderID" type="hidden" value = {{i.id}}>
                         <input type = submit value = "Ready"></form></td>
+                    {%if i.time != "Now"%}<td>{{i.time}}</td>{%endif%}
                 </tr>
             {%endif%}
         {%endfor%}

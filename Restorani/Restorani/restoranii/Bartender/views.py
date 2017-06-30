@@ -18,7 +18,8 @@ from django.contrib.auth import login
 
 def bartenderCheck(employee):
 	return employee.first_name=="BARTENDER"
-	
+
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(bartenderCheck,login_url='./')
 def bartenderPage(request):
 	if(request.user.last_name == "False"):
@@ -71,14 +72,14 @@ def bartenderPage(request):
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(bartenderCheck,login_url='./')
 def bartenderProfile(request):
 	bartender = Bartender.objects.get(email=request.user.username)
 	link = "./bartenderHomePage"
 	template = loader.get_template("bartenderProfile.html")
 	return HttpResponse(template.render({'bartender': bartender, 'back': link}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(bartenderCheck,login_url='./')
 @csrf_exempt
 def editBartenderProfile(request):
@@ -91,7 +92,7 @@ def editBartenderProfile(request):
 		bartender.shoeSize = request.POST.get('shoeSize')
 	bartender.save()
 	return redirect('bartenderProfile')
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(bartenderCheck,login_url='./')
 @csrf_exempt
 def changeBartenderPassword(request):
@@ -116,7 +117,7 @@ def changeBartenderPassword(request):
 		template = loader.get_template("error.html")
 		return HttpResponse(template.render({'error': err, 'link': link}))
 	return redirect('bartenderProfile')
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(bartenderCheck,login_url='./')
 @csrf_exempt
 def DrinkReady(request):

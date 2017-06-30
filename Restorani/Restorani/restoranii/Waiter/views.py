@@ -26,7 +26,7 @@ from django.contrib.auth import login
 def waiterCheck(employee):
     return employee.first_name == "WAITER"
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 def waiterPage(request):
     if (request.user.last_name == "False"):
@@ -116,7 +116,7 @@ def waiterPage(request):
         template = loader.get_template("static/firstLoginPasswordChange.html")
         return HttpResponse(template.render())
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 def waiterProfile(request):
     waiter = Waiter.objects.get(email=request.user.username)
@@ -124,7 +124,7 @@ def waiterProfile(request):
     template = loader.get_template("waiterProfile.html")
     return HttpResponse(template.render({'waiter': waiter, 'back': link}))
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def editWaiterProfile(request):
@@ -138,7 +138,7 @@ def editWaiterProfile(request):
     waiter.save()
     return redirect('waiterProfile')
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def changeWaiterPassword(request):
@@ -164,7 +164,7 @@ def changeWaiterPassword(request):
         return HttpResponse(template.render({'error': err, 'link': link}))
     return redirect('waiterProfile')
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def addOrder(request):  ##### IZBRISATI TESTIRANJE
@@ -177,7 +177,7 @@ def addOrder(request):  ##### IZBRISATI TESTIRANJE
     template = loader.get_template("addOrder.html")
     return HttpResponse(template.render({'tables': tables, 'food': food, 'drinks': drinks}))
 
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def saveOrder(request):
@@ -228,7 +228,7 @@ def saveOrder(request):
     order.employees = em
     order.save()
     return redirect("waiterHomePage")
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def editOrder(request):
@@ -239,7 +239,7 @@ def editOrder(request):
 	tables = RestaurantTable.objects.filter(restaurant=restaurant)
 	template = loader.get_template("editOrder.html")
 	return HttpResponse(template.render({'order': order}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def createBill(request):
@@ -255,7 +255,7 @@ def createBill(request):
 	total = foodTotal + drinkTotal
 	template = loader.get_template('bill.html')
 	return HttpResponse(template.render({'order':order,'total':total}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def payOrder(request):
@@ -267,7 +267,7 @@ def payOrder(request):
     waiter = Waiter.objects.get(email=request.user.username)
     orders = Order.objects.filter(employees=waiter)
     return redirect("waiterHomePage")
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def addFood(request):
@@ -279,7 +279,7 @@ def addFood(request):
     food = Food.objects.filter(restaurant=rest)
     template = loader.get_template("addFood.html")
     return HttpResponse(template.render({'order':order, 'food': food}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def addDrink(request):
@@ -291,7 +291,7 @@ def addDrink(request):
     drinks = Beaverage.objects.filter(restaurant=rest)
     template = loader.get_template("addDrink.html")
     return HttpResponse(template.render({'order': order, 'drinks': drinks}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def saveFoods(request):
@@ -330,7 +330,7 @@ def saveFoods(request):
     order.save()
     template = loader.get_template("editOrder.html")
     return HttpResponse(template.render({'order': order}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def saveDrinks(request):
@@ -369,6 +369,7 @@ def saveDrinks(request):
     order.save()
     template = loader.get_template("editOrder.html")
     return HttpResponse(template.render({'order': order}))
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def removeFood(request):
@@ -391,7 +392,7 @@ def removeFood(request):
     order.save()
     template = loader.get_template("editOrder.html")
     return HttpResponse(template.render({'order': order}))
-
+@login_required(redirect_field_name='IndexPage')
 @user_passes_test(waiterCheck, login_url='./')
 @csrf_exempt
 def removeDrink(request):
