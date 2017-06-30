@@ -117,7 +117,7 @@ class Order(models.Model):  # done
 
 class RatingFood(models.Model):  # done
     rating = models.IntegerField()
-    foods = models.ManyToManyField(Food)
+    food = models.ForeignKey(Food, null=True)
 
 
 class RatingRestaurant(models.Model):  # done
@@ -128,7 +128,7 @@ class RatingRestaurant(models.Model):  # done
 
 class RatingServices(models.Model):  # done
     rating = models.IntegerField()
-    employees = models.ManyToManyField(Employee)
+    employee = models.ForeignKey(Employee, null=True)
 
 
 class RestaurantManager(models.Model):  # done

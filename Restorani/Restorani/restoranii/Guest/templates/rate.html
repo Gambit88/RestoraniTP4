@@ -1,0 +1,23 @@
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+Rate your visit to {{name}}
+<br/>
+<br/>
+<form method="post" action="./rateRestaurant">
+<input type="hidden" value="{{id}}" name="id">
+Restaurant: <select id="restaurant" name="restaurant"><option value = 1> * </option><option value = 2> ** </option><option value = 3> *** </option><option value = 4> **** </option><option value = 5> ***** </option></select>
+<br/>
+Service: <select id="service" name="service"><option value = 1> * </option><option value = 2> ** </option><option value = 3> *** </option><option value = 4> **** </option><option value = 5> ***** </option></select>
+<br/>
+Food: <select id="food" name="food"><option value = 1> * </option><option value = 2> ** </option><option value = 3> *** </option><option value = 4> **** </option><option value = 5> ***** </option></select>
+<br/>
+<br/>
+<input type="button" onclick="window.location='./guestHomePage';" value="Cancel"/>&nbsp;&nbsp;&nbsp;<input type="submit" value="Rate">
+</form>
+<br/>
+<br/>
+</body>
+</html>

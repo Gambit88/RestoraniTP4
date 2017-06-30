@@ -24,6 +24,7 @@ from restorani.models import TableHelp
 from datetime import datetime, timedelta
 from django.db import connection
 from django.utils import timezone
+from restorani.models import RatingFood,RatingRestaurant,RatingServices, Schedule
 
 # Create your views here.
 #registracija
@@ -188,7 +189,7 @@ def restaurantList(request):
 		peopleList.append(friend)
 	#proracunaj distancu i rejting za svaki restoran
 	for rest in restaurants:
-		ratings = RatingRestaurant.objects.filter(id=rest.id)
+		ratings = RatingRestaurant.objects.filter(restaurant=rest)
 		
 		avrRate = 0
 		avrFRate = 0
@@ -591,7 +592,48 @@ def order_food(request):
 @login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')
 def rate(request):
-	pass
+	if request.method=='GET':
+		id = request.GET.get('id')
+		reservation = Reservation.objects.get(id=id)
+		template = loader.get_template("rate.html")
+		return HttpResponse(template.render({'id':id,'name':reservation.restaurant.name}))
+	if request.method=='POST':
+		id = request.POST.get('id')
+		rgrade = request.POST.get('restaurant')
+		wgrade = request.POST.get('service')
+		fgrade = request.POST.get('food')
+		reservation = Reservation.objects.get(id=id)
+		restaurant = reservation.restaurant
+		RatingRestaurant.objects.create(restaurant = restaurant,guest = request.user.guest, rating = int(rgrade))
+		#ocenjivanje konobara ispod
+		date = str(reservation.date).split(' ')
+		time = date[1]
+		date = date[0]
+		if time>='08:00' and time<='15:59':
+			shift = 1
+		if time>='16:00' and time<='23:59':
+			shift = 2
+		if time>='00:00' and time<='07:59':
+			shift = 3
+		try:
+			sch = Schedule.objects.filter(shift = shift, date = date)
+			for s in sch:
+				RatingServices.objects.create(employee = s.employee, rating = int(wgrade))
+		except:
+			pass
+		#ocenjivanje hrane ispod
+		try:
+			ord = Order.objects.filter(date = str(reservation.date))
+			for o in ord:
+				for foodO in o.orderedfoods.all():
+					RatingFood.objects.create(food = foodO.food, rating = int(fgrade))
+		except:
+			pass
+		#kraj ocenjivanja
+		reservation.rated = True
+		reservation.save()
+		return redirect("guestHomePage")
+	
 @csrf_exempt
 @login_required(redirect_field_name='IndexPage')
 @user_passes_test(guestCheck,login_url='./')	
@@ -638,21 +680,21 @@ def get_stars(dict,key):
 	if val<0.5:
 		return "-"
 	if val<1:
-		return "'"
+		return "•"
 	if val<1.5:
-		return "*"
+		return "⚹"
 	if val<2:
-		return "*'"
+		return "⚹•"
 	if val<2.5:
-		return "**"
+		return "⚹⚹"
 	if val<3:
-		return "**'"
+		return "⚹⚹•"
 	if val<3.5:
-		return "***"
+		return "⚹⚹⚹"
 	if val<4:
-		return "***'"
+		return "⚹⚹⚹•"
 	if val<4.5:
-		return "****"
+		return "⚹⚹⚹⚹"
 	if val<5:
-		return "****'"
-	return "*****"
+		return "⚹⚹⚹⚹•"
+	return "⚹⚹⚹⚹⚹"
