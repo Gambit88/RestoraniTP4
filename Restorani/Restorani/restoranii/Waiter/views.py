@@ -61,7 +61,6 @@ def waiterPage(request):
                     tlist.append(tableH)
         template = loader.get_template("waiterHomePage.html")
         schedule = Schedule.objects.filter(employee = waiter, date__gte = datetime.date.today())
-        print("AAAAAAAAAAAAAA")
         timeTemp = str(datetime.datetime.now().time()).split(':')
         time = timeTemp[0] + ':' + timeTemp[1]
         print(time)
