@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+
+    <form action="waiterProfit" method="post">
+        <select name="r"> {%for l in waiters %} <option value={{l.pk}}> {{l.name}} {{l.surname}} </option> {%endfor%} </select>
+        <input type="submit" value="Get">
+    </form>
+    <br>
+    Profit: {{total}} RSD
+</body>
+</html>

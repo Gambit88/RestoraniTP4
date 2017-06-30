@@ -536,13 +536,13 @@ def order_food(request):
 		template = loader.get_template("orderFoodGuest.html")
 		return HttpResponse(template.render({'res': res, 'food': food, 'drinks': drinks, 'tables':res.restaurantTables.all()}))
 	if request.method=='POST':
+		id = request.POST.get('id')
+		reservation = Reservation.objects.get(id = int(id))
 		if reservation.date<timezone.now():
 			error = 'You cannot use online order anymore.'
 			link = "./guestHomePage"
 			template = loader.get_template("error.html")
 			return HttpResponse(template.render({'error': error, 'link': link}))
-		id = request.POST.get('id')
-		reservation = Reservation.objects.get(id = int(id))
 		tableNumber = request.POST.get('tableNo')
 		orderedFood = request.POST.get('foods')
 		orderedDrinks = request.POST.get('drinks')
@@ -623,7 +623,7 @@ def rate(request):
 			pass
 		#ocenjivanje hrane ispod
 		try:
-			ord = Order.objects.filter(date = str(reservation.date))
+			ord = Order.objects.filter(time = str(reservation.date))
 			for o in ord:
 				for foodO in o.orderedfoods.all():
 					RatingFood.objects.create(food = foodO.food, rating = int(fgrade))

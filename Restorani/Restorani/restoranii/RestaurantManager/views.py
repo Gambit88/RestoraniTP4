@@ -20,6 +20,10 @@ from restorani.models import TableHelp
 from restorani.models import Schedule
 from restorani.models import Offer
 from restorani.models import Reservation
+from restorani.models import RatingRestaurant
+from restorani.models import RatingServices
+from restorani.models import RatingFood
+from restorani.models import Order
 import datetime
 from django.core.mail import send_mail
 from django.template.defaulttags import register
@@ -355,8 +359,43 @@ def schedule(request):
 											   date=date1)
 		else:
 			schedule = Schedule.objects.create(segment = section, employee = employee, shift = request.POST.get('shift'), date = date1)
+	s = Schedule.objects.all()
+	sc = []
+	for i in s:
+		if i.employee.restaurant == restaurant:
+			sc.append(i)
+	shift1 = []
+	shift2 = []
+	shift3 = []
+	for i in sc:
+		if i.shift == 1:
+			shift1.append(i)
+		if i.shift == 2:
+			shift2.append(i)
+		if i.shift == 3:
+			shift3.append(i)
+	today = datetime.date.today()
+	calendar1 = []
+	calendar1.append(today)
+	for i in range(1, 5):
+		today = today + datetime.timedelta(days=1)
+		calendar1.append(today)
+	calendar = []
+	for i in calendar1:
+		g = str(i)
+		calendar.append(g)
+	for i in shift1:
+		i.date = str(i.date).split(' ')[0]
+		i.save()
+	for i in shift2:
+		i.date = str(i.date).split(' ')[0]
+		i.save()
+	for i in shift3:
+		i.date = str(i.date).split(' ')[0]
+		i.save()
+
 	template = loader.get_template("schedule.html")
-	return HttpResponse(template.render({'employees': employees, 'segment': segment, 'rest': restaurant, 'x': shift,}))
+	return HttpResponse(template.render({'employees': employees, 'segment': segment, 'rest': restaurant, 'x': shift, 'calendar':calendar,'shift1': shift1,'shift2': shift2,'shift3': shift3}))
 
 @csrf_exempt
 @login_required(redirect_field_name='IndexPage')
@@ -492,3 +531,75 @@ def sendEmail(email, offer):
 	text = msg.as_string()
 	server.sendmail(fromaddr, toaddr, text)
 	server.quit()
+
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def avgerage(request):
+	manager = RestaurantManager.objects.get(email=request.user.username)
+	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
+	ratings = RatingRestaurant.objects.filter(restaurant=restaurant)
+	waiters = Waiter.objects.filter(restaurant = restaurant)
+	foods = Food.objects.filter(restaurant = restaurant)
+	avrRate = 0
+	numr = 0
+	counter = 0
+	total = 0
+	counterf = 0
+	totalf = 0
+	for rating in ratings:
+		avrRate = avrRate + rating.rating
+		numr = numr + 1
+	if numr != 0:
+		avrRate = avrRate / numr
+	if request.method == "POST":
+		if request.POST.get('type') == "w":
+			waiter = Waiter.objects.get(pk = request.POST.get('r'))
+			r = RatingServices.objects.filter(employee = waiter)
+			for i in r:
+				total += i.rating
+				counter += 1
+			try:
+				total = total / counter
+			except:
+				error = "No ratings for waiter"
+				link = "average.html"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error': error, 'link': link}))
+		if request.POST.get('type') == "f":
+			food = Food.objects.filter(pk = request.POST.get('f'))
+			r = RatingFood.objects.filter(food = food)
+			for i in r:
+				totalf += i.rating
+				counterf += 1
+			try:
+				totalf = totalf / counterf
+			except:
+				error = "No ratings for food"
+				link = "average.html"
+				template = loader.get_template("error.html")
+				return HttpResponse(template.render({'error': error, 'link': link}))
+	template = loader.get_template("average.html")
+	return HttpResponse(template.render({'avg': avrRate, 'waiters': waiters, 'totalW': total, 'totalf': totalf, 'food': foods}))
+
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def waiterProfit(request):
+	manager = RestaurantManager.objects.get(email=request.user.username)
+	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
+	waiters = Waiter.objects.filter(restaurant=restaurant)
+	total = ""
+	if request.method == "POST":
+		waiter = Waiter.objects.get(pk=request.POST.get('r'))
+		orders = Order.objects.filter(employees=waiter)
+		totalFood = 0
+		totalDrinks = 0
+		for i in orders:
+			for j in i.orderedfoods.all():
+				totalFood = j.food.price * j.amount
+			for j in i.ordereddrinks.all():
+				totalDrinks = j.beaverage.price * j.amount
+		total = totalFood + totalDrinks
+	template = loader.get_template("waiterProfit.html")
+	return HttpResponse(template.render({'waiters': waiters, 'total': total}))

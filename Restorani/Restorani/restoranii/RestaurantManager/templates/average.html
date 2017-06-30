@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="rmHomePage"> Back </a> <br> <br>
+    Average Rating of Restaurant: {{avg}} <br> <br>
+    <form action="average" method="post">
+        <input type="hidden" value="w" name="type">
+        <select name="r"> {%for l in waiters %} <option value={{l.pk}}> {{l.name}} {{l.surname}} </option> {%endfor%} </select>
+        <input type="submit" value="Get">
+    </form>
+    <br>
+    Average Rating: {{totalW}}
+    <br> <br>
+    <form action="average" method="post">
+        <input type="hidden" value="f" name="type">
+        <select name="f"> {%for l in food %} <option value={{l.pk}}> {{l.name}} </option> {%endfor%} </select>
+        <input type="submit" value="Get">
+    </form>
+    <br>
+    Average Rating: {{totalf}}
+</body>
+</html>
