@@ -11,6 +11,7 @@ from restorani.models import OrderedDrink
 from restorani.models import TableHelp
 from restorani.models import Schedule
 from restorani.models import Notification
+import datetime
 import json
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -37,7 +38,6 @@ def waiterPage(request):
         for i in orders:
             if restaurant == i.table.restaurant:
                 temp.append(i)
-       # notifications = []
         foodNotifications = Notification.objects.filter(type = "food")
         drinkNotifications = Notification.objects.filter(type = "drink")
         tables = RestaurantTable.objects.filter(restaurant=restaurant)
@@ -60,12 +60,58 @@ def waiterPage(request):
                     tableH.segment = ""
                     tlist.append(tableH)
         template = loader.get_template("waiterHomePage.html")
-        schedule = Schedule.objects.get(employee = waiter)
-        segment = schedule.segment
+        schedule = Schedule.objects.filter(employee = waiter, date__gte = datetime.date.today())
+        print("AAAAAAAAAAAAAA")
+        timeTemp = str(datetime.datetime.now().time()).split(':')
+        time = timeTemp[0] + ':' + timeTemp[1]
+        print(time)
+        if time >= '08:00' and time <= '15:59':
+            shift = 1
+        if time >= '16:00' and time <= '23:59':
+            shift = 2
+        if time >= '00:00' and time <= '07:59':
+            shift = 3
+        segment = ""
+        for i in schedule:
+            if i.shift == shift:
+                segment = i.segment
         listI = list(range(0, restaurant.sizeX))
         listJ = list(range(0,restaurant.sizeY))
-
-        return HttpResponse(template.render({'user': user, 'order': temp, 'tables':tlist, 'segment': segment,'listI':listI,'listJ':listJ,'foodNotifications':foodNotifications,'drinkNotifications':drinkNotifications}))
+        s = Schedule.objects.all()
+        sc = []
+        for i in s:
+            if i.employee.restaurant == restaurant and i.employee.user.first_name == "WAITER":
+               sc.append(i)
+        shift1 = []
+        shift2 = []
+        shift3 = []
+        for i in sc:
+            if i.shift == 1:
+                shift1.append(i)
+            if i.shift == 2:
+                shift2.append(i)
+            if i.shift == 3:
+                shift3.append(i)
+        today = datetime.date.today()
+        calendar1 = []
+        calendar1.append(today)
+        for i in range(1,5):
+            today = today + datetime.timedelta(days=1)
+            calendar1.append(today)
+        calendar = []
+        for i in calendar1:
+            g = str(i)
+            calendar.append(g)
+        for i in shift1:
+            i.date = str(i.date).split(' ')[0]
+            i.save()
+        for i in shift2:
+            i.date = str(i.date).split(' ')[0]
+            i.save()
+        for i in shift3:
+            i.date = str(i.date).split(' ')[0]
+            i.save()
+        return HttpResponse(template.render({'user': user, 'order': temp, 'tables':tlist, 'segment': segment,'listI':listI,'listJ':listJ,'foodNotifications':foodNotifications,'drinkNotifications':drinkNotifications,"calendar":calendar,'shift1': shift1,'shift2': shift2,'shift3': shift3}))
     else:
         template = loader.get_template("static/firstLoginPasswordChange.html")
         return HttpResponse(template.render())

@@ -13,6 +13,14 @@
     <br>
     <br>
     <table border="1">
+        <tr><td>Shifts</td>{%for i in calendar%}<td>{{i}}</td>{%endfor%}</tr>
+        <tr><td>First{%for i in calendar%}<td>{%for j in shift1%} {%if i == j.date%}{{j.employee.name}} {{j.employee.surname}}<br>{%endif%}{%endfor%}{%endfor%}</td></tr>
+        <tr><td>Second{%for i in calendar%}<td>{%for j in shift2%} {%if i == j.date%}{{j.employee.name}} {{j.employee.surname}}<br>{%endif%}{%endfor%}{%endfor%}</td></tr>
+        <tr><td>Third{%for i in calendar%}<td>{%for j in shift3%} {%if i == j.date%}{{j.employee.name}} {{j.employee.surname}}<br>{%endif%}{%endfor%}{%endfor%}</td></tr>
+    </table>
+    <br>
+    <br>
+    <table border="1">
         <tr align="center">Food to prepper</tr>
         <tr><td>Table Number</td><td align="center">Food</td></tr>
         {%for i in orders%}

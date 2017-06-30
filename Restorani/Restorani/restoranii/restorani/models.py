@@ -140,7 +140,7 @@ class RestaurantManager(models.Model):  # done
 
 
 class Schedule(models.Model):  # done
-    segment = models.ForeignKey(Segment)
+    segment = models.ForeignKey(Segment, null = True)
     employee = models.ForeignKey(Employee)
     shift = models.IntegerField()
     date = models.DateTimeField()

@@ -9,8 +9,16 @@
        <input type="submit" value="Logout"/>
     </form>
     <a href="./bartenderProfile">{{user}}</a>
-    <p>Bartener</p>
-    <p>Dodati listu pica koja treba da spremi ;)</p>
+    <br>
+    <br>
+    <table border="1">
+        <tr><td>Shifts</td>{%for i in calendar%}<td>{{i}}</td>{%endfor%}</tr>
+        <tr><td>First{%for i in calendar%}<td>{%for j in shift1%} {%if i == j.date%}{{j.employee.name}} {{j.employee.surname}}<br>{%endif%}{%endfor%}{%endfor%}</td></tr>
+        <tr><td>Second{%for i in calendar%}<td>{%for j in shift2%} {%if i == j.date%}{{j.employee.name}} {{j.employee.surname}}<br>{%endif%}{%endfor%}{%endfor%}</td></tr>
+        <tr><td>Third{%for i in calendar%}<td>{%for j in shift3%} {%if i == j.date%}{{j.employee.name}} {{j.employee.surname}}<br>{%endif%}{%endfor%}{%endfor%}</td></tr>
+    </table>
+    <br>
+    <br>
     <table border="1">
         <tr>Drinks to prepper</tr>
         <tr><td>Table Number</td><td>Drinks and amount</td></tr>

@@ -3,6 +3,8 @@ from restorani.models import Employee
 from restorani.models import Cook
 from restorani.models import Order
 from restorani.models import Notification
+from restorani.models import Schedule
+import datetime
 from django.template import loader
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -25,8 +27,43 @@ def cookPage(request):
 		for i in orders:
 			if c.restaurant == i.table.restaurant:
 				temp.append(i)
+		restaurant = c.restaurant
+		s = Schedule.objects.all()
+		sc = []
+		for i in s:
+			if i.employee.restaurant == restaurant and i.employee.user.first_name == "COOK":
+				sc.append(i)
+		shift1 = []
+		shift2 = []
+		shift3 = []
+		for i in sc:
+			if i.shift == 1:
+				shift1.append(i)
+			if i.shift == 2:
+				shift2.append(i)
+			if i.shift == 3:
+				shift3.append(i)
+		today = datetime.date.today()
+		calendar1 = []
+		calendar1.append(today)
+		for i in range(1, 5):
+			today = today + datetime.timedelta(days=1)
+			calendar1.append(today)
+		calendar = []
+		for i in calendar1:
+			g = str(i)
+			calendar.append(g)
+		for i in shift1:
+			i.date = str(i.date).split(' ')[0]
+			i.save()
+		for i in shift2:
+			i.date = str(i.date).split(' ')[0]
+			i.save()
+		for i in shift3:
+			i.date = str(i.date).split(' ')[0]
+			i.save()
 		template = loader.get_template("cookHomePage.html")
-		return HttpResponse(template.render({'user': user,'orders':temp}))
+		return HttpResponse(template.render({'user': user,'orders':temp,"calendar":calendar,'shift1': shift1,'shift2': shift2,'shift3': shift3}))
 	else:
 		template = loader.get_template("static/firstLoginPasswordChange.html")
 		return HttpResponse(template.render())
