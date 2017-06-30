@@ -16,4 +16,5 @@ urlpatterns = [
 	url(r'^average', views.avgerage),
 	url(r'^waiterProfit', views.waiterProfit),
 	url(r'^restaurantProfit', views.restProfit),
+	url(r'^visitation', views.visitation),
 ]

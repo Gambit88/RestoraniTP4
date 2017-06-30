@@ -628,3 +628,33 @@ def restProfit(request):
 	total = totalFood + totalDrinks
 	template = loader.get_template("restaurantProfit.html")
 	return HttpResponse(template.render({'profit': total}))
+
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def visitation(request):
+	manager = RestaurantManager.objects.get(email=request.user.username)
+	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
+	today = datetime.date.today()
+	t = datetime.date.today()
+	dates = []
+	counterToday = 0
+	counterWeek = 0
+	dates.append(today)
+	res = Reservation.objects.filter(restaurant = restaurant)
+	for i in res:
+		date = str(i.date).split(" ")[0]
+		t = str(t)
+		if date == t:
+			counterToday += 1
+	for i in range(6):
+		today = today - datetime.timedelta(days=1)
+		dates.append(today)
+	for i in dates:
+		date = str(i)
+		for j in res:
+			dateRes = str(j.date).split(" ")[0]
+			if date == dateRes:
+				counterWeek += 1
+	template = loader.get_template("visitation.html")
+	return HttpResponse(template.render({'counterT': counterToday, 'counterW': counterWeek, 'rest': restaurant}))
