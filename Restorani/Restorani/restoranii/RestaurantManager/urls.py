@@ -15,4 +15,5 @@ urlpatterns = [
 	url(r'^viewOffers', views.viewOffers),
 	url(r'^average', views.avgerage),
 	url(r'^waiterProfit', views.waiterProfit),
+	url(r'^restaurantProfit', views.restProfit),
 ]

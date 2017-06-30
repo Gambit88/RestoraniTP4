@@ -603,3 +603,28 @@ def waiterProfit(request):
 		total = totalFood + totalDrinks
 	template = loader.get_template("waiterProfit.html")
 	return HttpResponse(template.render({'waiters': waiters, 'total': total}))
+
+@csrf_exempt
+@login_required(redirect_field_name='IndexPage')
+@user_passes_test(restaurantManagerCheck,login_url='./')
+def restProfit(request):
+	manager = RestaurantManager.objects.get(email=request.user.username)
+	restaurant = Restaurant.objects.get(pk=manager.restaurant_id)
+	o = Order.objects.all()
+	orders = []
+	total = ""
+	for i in o:
+		for j in i.employees.all():
+			if j.restaurant == restaurant:
+				if i not in orders:
+					orders.append(i)
+	totalFood = 0
+	totalDrinks = 0
+	for i in orders:
+		for j in i.orderedfoods.all():
+			totalFood = j.food.price * j.amount
+		for j in i.ordereddrinks.all():
+			totalDrinks = j.beaverage.price * j.amount
+	total = totalFood + totalDrinks
+	template = loader.get_template("restaurantProfit.html")
+	return HttpResponse(template.render({'profit': total}))
